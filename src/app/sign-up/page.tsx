@@ -4,6 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { useSignupMutation } from "@/feature/auth/authApi";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { ROUTES } from "@/constants/routes";
+import Link from "next/link";
 
 interface SignUpFormInputs {
     name: string;
@@ -14,10 +19,19 @@ interface SignUpFormInputs {
 
 const Page = () => {
     const { register, handleSubmit, formState: { errors } } = useForm<SignUpFormInputs>();
+    const [signup, { isLoading }] = useSignupMutation();
+    const router = useRouter();
 
-    const onSubmit: SubmitHandler<SignUpFormInputs> = (data) => {
-        console.log(data);
-        // Perform signup action here
+    const onSubmit: SubmitHandler<SignUpFormInputs> = async (data) => {
+        try {
+            const response = await signup(data).unwrap();
+            console.log('Signup successful:', response);
+            toast.success("User Signed up successfully")
+            router.push('/login');
+        } catch (err: any) {
+            console.error('Signup failed:', err);
+            toast.error(err.data?.message || 'Signup failed. Please try again.');
+        }
     };
 
     return (
@@ -74,8 +88,12 @@ const Page = () => {
                         />
                         {errors.confirmPassword && <span className="text-red-500">{errors.confirmPassword.message}</span>}
                     </div>
-
-                    <Button type="submit" className="w-full">Sign Up</Button>
+                    <Link className="cursor-pointer underline" href={ROUTES.login}>
+                        Already have an account?
+                    </Link>
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                        {isLoading ? 'Signing up...' : 'Sign Up'}
+                    </Button>
                 </form>
             </div>
         </div>

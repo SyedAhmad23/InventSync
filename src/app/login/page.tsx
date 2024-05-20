@@ -6,6 +6,10 @@ import { ROUTES } from "@/constants/routes";
 import Link from "next/link";
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { useLoginMutation } from "@/feature/auth/authApi";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { useConfig } from "../config/hooks";
 
 interface LoginFormInputs {
     email: string;
@@ -14,10 +18,20 @@ interface LoginFormInputs {
 
 const Page = () => {
     const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
+    const [login, { isLoading, error }] = useLoginMutation();
+    const { updateUser } = useConfig();
+    const router = useRouter();
 
-    const onSubmit: SubmitHandler<LoginFormInputs> = (data) => {
-        console.log(data);
-        // Perform login action here
+    const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
+        try {
+            const response = await login(data).unwrap();
+            console.log('Login successful:', response);
+            updateUser(response.user, response.token);
+            router.push('/dashboard');
+        } catch (err: any) {
+            console.error('Login failed:', err);
+            toast.error(err.data?.message || 'Login failed. Please try again.');
+        }
     };
 
     return (
@@ -57,10 +71,10 @@ const Page = () => {
                     <Link className="cursor-pointer underline" href={ROUTES.forgotPassword}>
                         Forgot Password?
                     </Link>
-                    <Button type="submit" className="w-full mt-5">Login</Button>
+                    <Button type="submit" className="w-full mt-5" disabled={isLoading}>
+                        {isLoading ? 'Logging in...' : 'Login'}
+                    </Button>
                 </form>
-
-
             </div>
         </div>
     );
