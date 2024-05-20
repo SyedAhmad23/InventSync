@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import User from "@/models/User";
 import connectToDatabase from "@/app/lib/db";
+import User from "@/models/User";
+import nodemailer from "nodemailer";
+
+// Create Nodemailer transporter
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.GMAIL_EMAIL,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
 
 export async function POST(req: NextRequest) {
   await connectToDatabase();
@@ -21,8 +31,25 @@ export async function POST(req: NextRequest) {
   user.resetPasswordExpires = resetTokenExpiry;
   await user.save();
 
-  // Simulate sending an email (in reality, you'd send an actual email)
-  console.log(`Password reset token (for testing purposes): ${resetToken}`);
+  // Send email
+  const mailOptions = {
+    from: process.env.GMAIL_EMAIL,
+    to: email,
+    subject: "Password Reset Link",
+    text: `Here is your password reset link: http://localhost:3000/api/auth/reset-password?token=${resetToken}`,
+    html: `<p>Here is your password reset link: <a href="http://localhost:3000/api/auth/reset-password?token=${resetToken}">Reset Password</a></p>`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Password reset email sent");
+  } catch (error) {
+    console.error("Error sending password reset email:", error);
+    return NextResponse.json(
+      { error: "Error sending password reset email" },
+      { status: 500 }
+    );
+  }
 
   return NextResponse.json(
     { message: "Password reset link sent to your email" },
