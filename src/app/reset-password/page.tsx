@@ -6,15 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useResetPasswordMutation } from "@/feature/auth/authApi";
 import { ROUTES } from "@/constants/routes";
-
-interface Props { }
+import { toast } from "react-toastify";
 
 type FormInputs = {
     newPassword: string;
     confirmNewPassword: string;
 };
 
-function ResetPassword({ }: Props) {
+function ResetPassword() {
     const { register, handleSubmit } = useForm<FormInputs>();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -22,22 +21,20 @@ function ResetPassword({ }: Props) {
 
     const onSubmitHandler = async (data: FormInputs) => {
         if (data.newPassword !== data.confirmNewPassword) {
-            alert("Passwords do not match");
+            toast.error("Passwords do not match");
             return;
         }
-
         const token = searchParams.get("token");
-
         if (!token) {
-            alert("Invalid or missing token");
+            toast("Invalid or missing token");
             return;
         }
-
         try {
-            await resetPassword({ token, newPassword: data.newPassword }).unwrap();
+            await resetPassword({ token, newPassword: data.newPassword, confirmNewPassword: data.confirmNewPassword }).unwrap();
             router.push(ROUTES.login);
         } catch (error) {
             console.error(error);
+            toast.error("Failed to reset password. Please try again.");
         }
     };
 

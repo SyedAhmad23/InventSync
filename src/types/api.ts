@@ -1,10 +1,4 @@
-import {
-  Product,
-  Restaurant,
-  User,
-  chartStats,
-  individualStats,
-} from "@/types/index";
+import { Product, User, chartStats, individualStats } from "@/types/index";
 
 export interface APIPagination<T> {
   docs: T[];
@@ -80,73 +74,12 @@ export interface ProductRequest {
   image: Blob;
 }
 
-export interface AddonsRequest {
-  name: string;
-  price: number;
-  restaurant_id: number;
-}
-
-export interface OfferRequest {
-  id?: number;
-  offer_title?: string;
-  active_from?: string;
-  active_until?: string;
-  discount_type?: "fixed" | "percentage";
-  discount_value?: string;
-  voucher_code?: string;
-  status?: "active" | "inactive";
-  restaurant_id?: number;
-  restaurant?: Restaurant;
-}
-
-export interface OrderRequest {
-  id: number;
-  status: "in_progress" | "ready" | "completed";
-  restaurant_id: number;
-  restaurant?: Restaurant;
-}
-
-export interface AllergenRequest {
-  name: string;
-  price: number;
-}
-
 export interface UserUpdateRequest {
   image: File | null;
   name: string;
   email: string;
   phone: string;
   address: string;
-}
-
-export interface RestaurantRequest {
-  name: string;
-  description: string;
-  email: string;
-  address: string;
-  contact_number: string;
-  cover_image: string;
-  profile_image: string;
-}
-export interface BranchRequest {
-  id?: number;
-  restaurant_id?: number;
-  restaurant?: Restaurant;
-  status?: string;
-  name?: string;
-  description?: string;
-  email?: string;
-  address?: string;
-  contact_number?: string;
-}
-
-export interface MenuResponse {
-  categories: {
-    id: number;
-    name: string;
-    products: Product[];
-  }[];
-  restaurant: Restaurant;
 }
 
 export interface DashboardStats {

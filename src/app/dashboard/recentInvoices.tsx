@@ -1,4 +1,5 @@
 import React from 'react';
+import { Table, TableHead, TableBody, TableRow, TableCell, TableHeader } from '@/components/ui/table';
 
 const RecentInvoices = () => {
     const invoices = [
@@ -14,43 +15,27 @@ const RecentInvoices = () => {
     ];
 
     return (
-        <div className="overflow-hidden bg-white shadow sm:rounded-lg whitespace-nowrap">
-            <div className="flex flex-col">
-                <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                    <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                        <div className="overflow-hidden border-b border-gray-200 shadow sm:rounded-lg">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-200 text-black text-xs font-medium ">
-                                    <tr>
-                                        <th scope="col" className="px-6 py-3 text-left  uppercase tracking-wider">
-                                            Name
-                                        </th>
-                                        <th scope="col" className="px-6 py-3 text-left  uppercase tracking-wider">
-                                            Number
-                                        </th>
-                                        <th scope="col" className="px-6 py-3 text-left  uppercase tracking-wider">
-                                            Amount
-                                        </th>
-                                        <th scope="col" className="px-6 py-3 text-left  uppercase tracking-wider">
-                                            Status
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                    {invoices.map((invoice) => (
-                                        <tr key={invoice.id}>
-                                            <td className="px-6 py-4 whitespace-nowrap">{invoice.name}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{invoice.number}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{invoice.amount}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{invoice.status}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div className="overflow-hidden bg-white shadow sm:rounded-lg">
+            <Table>
+                <TableHeader className="w-[100px]">
+                    <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Number</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Status</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {invoices.map((invoice) => (
+                        <TableRow key={invoice.id}>
+                            <TableCell>{invoice.name}</TableCell>
+                            <TableCell>{invoice.number}</TableCell>
+                            <TableCell>{invoice.amount}</TableCell>
+                            <TableCell>{invoice.status}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
         </div>
     );
 };

@@ -18,7 +18,7 @@ interface LoginFormInputs {
 
 const Page = () => {
     const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
-    const [login, { isLoading, error }] = useLoginMutation();
+    const [login, { isLoading }] = useLoginMutation();
     const { updateUser } = useConfig();
     const router = useRouter();
 

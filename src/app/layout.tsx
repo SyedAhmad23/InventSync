@@ -7,6 +7,7 @@ import { Provider } from "react-redux";
 import store from "@/app/store/store";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ManagedModal from "@/components/managed-modal/managed-modal";
 const inter = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -33,6 +34,7 @@ export default function RootLayout({
         <Provider store={store}>
           {children}
           <ToastContainer position="top-right" autoClose={5000} />
+          <ManagedModal />
         </Provider>
       </body>
     </html>

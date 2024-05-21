@@ -1,4 +1,5 @@
 import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import Image, { StaticImageData } from "next/image";
 
 interface CustomCardProps {
@@ -10,15 +11,25 @@ interface CustomCardProps {
 
 const DisplayCard: React.FC<CustomCardProps> = ({ logo, text, number, className }) => {
     return (
-        <div className={` bg-gray-200 rounded-lg shadow p-4 flex items-center border border-black ${className}`}>
-            <div className="mr-4">
-                {logo && <Image src={logo} alt="logo" width={48} height={48} />}
+        <Card className={` flex items-center ${className}`}>
+            {logo && (
+                <Image
+                    src={logo}
+                    alt="logo"
+                    width={48}
+                    height={48}
+                    className="mx-4"
+                />
+            )}
+            <div className="items-center mt-4">
+                <CardContent>
+                    <h2 className="text-xl font-semibold">
+                        {text}
+                    </h2>
+                    <p >{number}</p>
+                </CardContent>
             </div>
-            <div>
-                <p className="text-lg font-semibold">{text}</p>
-                <p className="">{number}</p>
-            </div>
-        </div>
+        </Card>
     );
 };
 

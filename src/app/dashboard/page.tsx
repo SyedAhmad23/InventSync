@@ -1,5 +1,5 @@
 "use client";
-import Layout from "@/components/ui/layout/layout";
+import Layout from "@/components/layout/layout";
 import product from "@/assets/icons/product.png";
 import DisplayCard from "@/app/dashboard/displayCard";
 import PieChart from "@/app/dashboard/PieChart";
@@ -11,10 +11,10 @@ export default function Home() {
         <main className="">
             <Layout>
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
-                    <DisplayCard number={500} text="TOTAL RECEIVABLE" className=" flex bg-blue-100 font-bold" />
-                    <DisplayCard number={700} text="Total RECEIVED AMOUNT" className=" flex bg-slate-100 font-bold" />
-                    <DisplayCard number={800} text="Total DISCOUNT GIVEN" className=" flex bg-orange-100 font-bold " />
-                    <DisplayCard number={800} text="Total REVENUE" className=" flex bg-emerald-100 font-bold" />
+                    <DisplayCard number={500} text="TOTAL RECEIVABLE" className="bg-gray-200" />
+                    <DisplayCard number={700} text="Total RECEIVED AMOUNT" className="bg-gray-200" />
+                    <DisplayCard number={800} text="Total DISCOUNT GIVEN" className="bg-gray-200" />
+                    <DisplayCard number={800} text="Total REVENUE" className="bg-gray-200" />
                 </div>
 
                 <div className=" grid md:grid-cols-2 lg:grid-cols-4 gap-5 my-10">

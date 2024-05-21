@@ -13,7 +13,32 @@ export const productApi = createApi({
         method: "GET",
       }),
     }),
+    addProduct: builder.mutation<void, FormData>({
+      query: (formData) => ({
+        url: API_ENDPOINTS.PRODUCT,
+        method: "POST",
+        body: formData,
+      }),
+    }),
+    updateProduct: builder.mutation<void, { id: string; formData: FormData }>({
+      query: ({ id, formData }) => ({
+        url: `${API_ENDPOINTS.PRODUCT}/${id}`,
+        method: "PUT",
+        body: formData,
+      }),
+    }),
+    deleteProduct: builder.mutation<void, { id: string }>({
+      query: ({ id }) => ({
+        url: `${API_ENDPOINTS.PRODUCT}/${id}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
-export const { useGetAllProductsQuery } = productApi;
+export const {
+  useGetAllProductsQuery,
+  useAddProductMutation,
+  useUpdateProductMutation,
+  useDeleteProductMutation,
+} = productApi;

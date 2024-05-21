@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { useForgotPasswordMutation } from "@/feature/auth/authApi";
+import { toast } from "react-toastify";
 
 interface Props { }
 
@@ -23,6 +24,7 @@ function ForgotPassword({ }: Props) {
         try {
             await forgotPassword(data).unwrap();
             // router.push(ROUTES.resetPassword);
+            toast.success("Password reset link sent to your email");
         } catch (error) {
             console.error(error);
         }

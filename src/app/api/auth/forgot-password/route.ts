@@ -36,8 +36,8 @@ export async function POST(req: NextRequest) {
     from: process.env.GMAIL_EMAIL,
     to: email,
     subject: "Password Reset Link",
-    text: `Here is your password reset link: http://localhost:3000/api/auth/reset-password?token=${resetToken}`,
-    html: `<p>Here is your password reset link: <a href="http://localhost:3000/api/auth/reset-password?token=${resetToken}">Reset Password</a></p>`,
+    text: `Here is your password reset link: http://localhost:3000/reset-password?token=${resetToken}`,
+    html: `<p>Here is your password reset link: <a href="http://localhost:3000/reset-password?token=${resetToken}">Reset Password</a></p>`,
   };
 
   try {
