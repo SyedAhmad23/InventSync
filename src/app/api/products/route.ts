@@ -3,21 +3,62 @@ import Product from "@/models/Product";
 import connectToDatabase from "@/app/lib/db";
 
 export async function GET() {
-  await connectToDatabase();
+  try {
+    await connectToDatabase();
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Failed to connect to the database" },
+      { status: 500 }
+    );
+  }
 
-  const products = await Product.find();
+  let products;
+
+  try {
+    products = await Product.find();
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Failed to fetch products from the database" },
+      { status: 500 }
+    );
+  }
 
   if (!products || products.length === 0) {
     return NextResponse.json({ message: "No products found" }, { status: 404 });
   }
 
-  return NextResponse.json({ products });
+  return NextResponse.json({ products }, { status: 200 });
 }
 
 export async function POST(req: NextRequest) {
-  await connectToDatabase();
-  const { name, category, description, image, quantity, price } =
-    await req.json();
+  try {
+    await connectToDatabase();
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Failed to connect to the database" },
+      { status: 500 }
+    );
+  }
+
+  let productData;
+
+  try {
+    productData = await req.json();
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Invalid JSON in request body" },
+      { status: 400 }
+    );
+  }
+
+  const { name, category, description, image, quantity, price } = productData;
+
+  if (!name || !category || !description || !image || !quantity || !price) {
+    return NextResponse.json(
+      { message: "Missing required fields" },
+      { status: 400 }
+    );
+  }
 
   const newProduct = new Product({
     name,
@@ -27,7 +68,15 @@ export async function POST(req: NextRequest) {
     quantity,
     price,
   });
-  await newProduct.save();
+
+  try {
+    await newProduct.save();
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Failed to create product" },
+      { status: 500 }
+    );
+  }
 
   return NextResponse.json(
     { message: "Product created successfully", product: newProduct },
