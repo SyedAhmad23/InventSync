@@ -73,13 +73,9 @@ const ProductPage: React.FC = () => {
             })
         );
     };
-    const handleUpdateProduct = (id: string) => {
-        dispatch(
-            openModal({
-                view: "UPDATE_PRODUCT",
-                data: { title: "Update Product", id },
-            })
-        );
+
+    const handleUpdateProduct = (selectedProduct: Product) => {
+        dispatch(openModal({ view: "UPDATE_PRODUCT", data: { product: selectedProduct } }));
     };
 
     return (
@@ -159,13 +155,16 @@ const ProductPage: React.FC = () => {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem
-                                                    //@ts-ignore
-                                                    onClick={() => handleUpdateProduct(product._id)}>
-                                                    Edit</DropdownMenuItem>
+                                                    onClick={() => handleUpdateProduct(product)}
+                                                >
+                                                    Edit
+                                                </DropdownMenuItem>
                                                 <DropdownMenuItem
                                                     //@ts-ignore
-                                                    onClick={() => onDeleteProduct(product._id)}>
-                                                    Delete</DropdownMenuItem>
+                                                    onClick={() => onDeleteProduct(product._id)}
+                                                >
+                                                    Delete
+                                                </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>

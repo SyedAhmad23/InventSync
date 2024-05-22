@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useDispatch, useSelector } from "react-redux";
@@ -10,19 +10,15 @@ import { ProductFormSchema, ProductFormValues } from "@/schema/product-form.sche
 import { closeModal } from "@/feature/modal/modalSlice";
 import { useUpdateProductMutation } from "@/feature/product/productApi";
 import { Input } from "@/components/ui/input";
-import Select from "react-select";
-import { BiLeftTopArrowCircle } from "react-icons/bi";
 import { RootState } from "@/app/store/store";
 import { Product } from "@/types";
 
-
-const UpdateProduct = ({ }) => {
+const UpdateProduct: React.FC = () => {
     const modalState = useSelector((state: RootState) => state.modal);
     const fileRef = React.useRef<HTMLInputElement>(null);
     const product = modalState.data.product as Product;
-    console.log("Modal State data product:", product?._id);
-
     const dispatch = useDispatch();
+
     const {
         register,
         handleSubmit,
@@ -33,27 +29,20 @@ const UpdateProduct = ({ }) => {
         resolver: yupResolver(ProductFormSchema),
     });
     const [updateProduct, { isLoading: isLoadingUpdate }] = useUpdateProductMutation();
+
     useEffect(() => {
-        console.log("Selected Product", modalState);
-        reset({
-            name: product?.name,
-            price: product?.price,
-            description: product?.description,
-            quantity: product?.quantity,
-            category: product?.category?.id || undefined,
-            image: product?.image,
-
-        });
-        console.log("Resetting form with producttt:", product);
-        console.log("Default Name:", product?.name);
-        console.log("Default Price:", product?.price);
-        console.log("Default Description:", product?.description);
-        console.log("Default Quantity:", product?.quantity);
-        console.log("Default Category:", product?.category?.id);
-        console.log("Default Image:", product?.image);
-
+        if (product) {
+            reset({
+                name: product?.name,
+                price: product?.price,
+                description: product?.description,
+                quantity: product?.quantity,
+                category: product?.category?.id || undefined,
+                image: product?.image,
+            });
+            setImageInfo({ file: null, src: product?.image || "" });
+        }
     }, [product, reset]);
-    console.log("Resetting form with product:", product);
 
     const [imageInfo, setImageInfo] = useState({
         file: null as File | null,
@@ -74,7 +63,6 @@ const UpdateProduct = ({ }) => {
         }
     };
 
-
     const onSubmit = async (data: ProductFormValues) => {
         const { name, description, price, category, quantity, image } = data;
         let jsonData = {
@@ -84,17 +72,19 @@ const UpdateProduct = ({ }) => {
             category: Number(category),
             quantity: Number(quantity),
         };
+
         if (imageInfo.file) {
             const imageUrl = URL.createObjectURL(imageInfo.file);
             jsonData = {
                 ...jsonData,
-                // @ts-ignore
-                image: imageUrl
+                //@ts-ignore
+                image: imageUrl,
             };
         }
+
         try {
             //@ts-ignore
-            await updateProduct({ id: product._id, data: jsonData }).unwrap();
+            await updateProduct({ id: product._id, formData: jsonData }).unwrap();
             reset();
             setImageInfo({ file: null, src: "" });
             dispatch(closeModal());
@@ -110,18 +100,33 @@ const UpdateProduct = ({ }) => {
                 <ModalContent>
                     <div className="flex justify-center">
                         <div>
-                            <div className="bg-slate-100 aspect-video relative rounded-lg h-60 overflow-hidden" onClick={() => fileRef.current?.click()}>
+                            <div
+                                className="bg-slate-100 aspect-video relative rounded-lg h-60 overflow-hidden"
+                                onClick={() => fileRef.current?.click()}
+                            >
                                 <input ref={fileRef} hidden type="file" accept="image/*" onChange={handleImageChange} />
-                                <Image src={imageInfo?.src} alt="picture" fill className={imageInfo?.src ? "object-cover" : "object-contain"} />
+                                <img
+                                    src={imageInfo?.src}
+                                    alt="picture"
+                                    // fill
+                                    width={40}
+                                    height={40}
+                                    className={imageInfo?.src ? "object-cover" : "object-contain"}
+                                />
                             </div>
                             <div className="mt-4">
-                                <Button className="w-full" onClick={(e) => { e.preventDefault(); fileRef.current?.click(); }}>
+                                <Button className="w-full" onClick={(e) => {
+                                    e.preventDefault();
+                                    fileRef.current?.click();
+                                }}>
                                     Add Image
                                 </Button>
                             </div>
                         </div>
                     </div>
-                    {errors.image && <span className="text-red-600 text-sm font-medium">{errors.image?.message}</span>}
+                    {errors.image && (
+                        <span className="text-red-600 text-sm font-medium">{errors.image?.message}</span>
+                    )}
                     <div className="mt-6">
                         <p className="text-base font-medium">Product Information</p>
                         <div className="grid md:grid-cols-2 gap-x-6 gap-y-4 mt-3">
@@ -130,8 +135,7 @@ const UpdateProduct = ({ }) => {
                             <div>
                                 <Input {...register("category")} id="category" label="Category" placeholder="Enter product category" />
                             </div>
-                            <Input {...register("quantity")} id="quantity" type="number" label="Quantity" placeholder="How many product quanity?" />
-
+                            <Input {...register("quantity")} id="quantity" type="number" label="Quantity" placeholder="How many product quantity?" />
                         </div>
                         <div className="mt-2">
                             <label className="text-charcoalGray">Description</label>

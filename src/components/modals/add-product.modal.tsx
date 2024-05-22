@@ -34,30 +34,6 @@ const AddProduct = () => {
     };
 
 
-    // const onSubmit = async (data: ProductFormValues) => {
-    //     const { name, description, price, category_id, quantity } = data;
-    //     const formData = new FormData();
-    //     if (imageInfo.file) formData.append("image", imageInfo.file);
-    //     formData.append("name", name);
-    //     formData.append("description", description);
-    //     formData.append("price", price.toString());
-    //     formData.append("category_id", category_id.toString());
-    //     formData.append("quantity", quantity.toString());
-
-    //     Object.entries(formData).forEach(([key, value]) => {
-    //         formData.append(key, value);
-    //     });
-
-    //     try {
-    //         await addProduct(formData).unwrap();
-    //         reset();
-    //         setImageInfo({ file: null, src: "" });
-    //         dispatch(closeModal());
-    //         toast.success("Product added successfully");
-    //     } catch (error) {
-    //         toast.error("Failed to add product");
-    //     }
-    // };
     const onSubmit = async (data: ProductFormValues) => {
         const { name, description, price, category, quantity, image } = data;
         let jsonData = {
@@ -129,7 +105,7 @@ const AddProduct = () => {
                 )} */}
                                 <Input {...register("category")} id="category" label="Category" placeholder="Enter product category" />
                             </div>
-                            <Input {...register("quantity")} id="quantity" type="number" label="Quantity" placeholder="How many product quanity?" />
+                            <Input {...register("quantity")} id="quantity" min={1} type="number" label="Quantity" placeholder="How many product quanity?" />
 
                         </div>
                         <div className="mt-2">
