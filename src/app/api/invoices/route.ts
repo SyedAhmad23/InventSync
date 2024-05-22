@@ -17,12 +17,15 @@ export async function GET() {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { paid: boolean } }
+) {
   await connectToDatabase();
 
   try {
     const body = await req.json();
-    const { products } = body;
+    const { products, paid } = body;
 
     if (!products || products.length === 0) {
       return NextResponse.json(
@@ -37,13 +40,22 @@ export async function POST(req: NextRequest) {
     for (const item of products) {
       const { product: productId, quantity } = item;
 
-      // Fetch product details
       const product = await Product.findById(productId);
 
       if (!product) {
         return NextResponse.json(
           { error: `Product with ID ${productId} not found` },
           { status: 404 }
+        );
+      }
+
+      // Check if the product quantity is available
+      if (quantity > product.quantity) {
+        return NextResponse.json(
+          {
+            error: `Quantity of product with ID ${productId} is not available. Available quantity: ${product.quantity}`,
+          },
+          { status: 400 }
         );
       }
 
@@ -57,11 +69,21 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Update the product quantity in the database
+    for (const item of processedProducts) {
+      const { product: productId, quantity } = item;
+      await Product.findByIdAndUpdate(productId, {
+        $inc: { quantity: -quantity },
+      });
+    }
+
     const invoice = new Invoice({
       products: processedProducts,
       totalAmount,
-      paid: false,
+      paid,
     });
+
+    console.log(invoice, "invoice");
 
     await invoice.save();
 
