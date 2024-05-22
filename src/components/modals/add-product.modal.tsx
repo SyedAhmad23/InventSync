@@ -13,7 +13,7 @@ import { useAddProductMutation } from "@/feature/product/productApi";
 import { Input } from "@/components/ui/input";
 import { Category } from "@/types";
 import Select from "react-select";
-import { BiLeftTopArrowCircle } from "react-icons/bi";
+import NoImg from "@/assets/images/no-img.png";
 
 const AddProduct = () => {
     const fileRef = useRef<HTMLInputElement | null>(null);
@@ -72,7 +72,7 @@ const AddProduct = () => {
                         <div>
                             <div className="bg-slate-100 aspect-video relative rounded-lg h-60 overflow-hidden" onClick={() => fileRef.current?.click()}>
                                 <input ref={fileRef} hidden type="file" accept="image/*" onChange={handleImageChange} />
-                                <Image src={imageInfo?.src} alt="picture" fill className={imageInfo?.src ? "object-cover" : "object-contain"} />
+                                <Image src={imageInfo?.src || NoImg} alt="picture" fill className={imageInfo?.src ? "object-cover" : "object-contain"} />
                             </div>
                             <div className="mt-4">
                                 <Button className="w-full" onClick={(e) => { e.preventDefault(); fileRef.current?.click(); }}>

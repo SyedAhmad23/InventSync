@@ -19,9 +19,20 @@ export interface Category {
   id: number;
   name: string;
   description: string;
+  type: string;
+  createdAt: string;
+  updatedAt: string;
 }
-
+export interface Invoice {
+  _id: string;
+  products: Product[];
+  totalAmount: number;
+  paid: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 export interface Product {
+  product: string | null;
   id: number;
   name: string;
   price: number;

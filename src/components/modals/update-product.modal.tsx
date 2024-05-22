@@ -12,6 +12,7 @@ import { useUpdateProductMutation } from "@/feature/product/productApi";
 import { Input } from "@/components/ui/input";
 import { RootState } from "@/app/store/store";
 import { Product } from "@/types";
+import NoImg from "@/assets/images/no-img.png";
 
 const UpdateProduct: React.FC = () => {
     const modalState = useSelector((state: RootState) => state.modal);
@@ -105,12 +106,10 @@ const UpdateProduct: React.FC = () => {
                                 onClick={() => fileRef.current?.click()}
                             >
                                 <input ref={fileRef} hidden type="file" accept="image/*" onChange={handleImageChange} />
-                                <img
-                                    src={imageInfo?.src}
+                                <Image
+                                    src={imageInfo?.src || NoImg}
                                     alt="picture"
-                                    // fill
-                                    width={40}
-                                    height={40}
+                                    fill
                                     className={imageInfo?.src ? "object-cover" : "object-contain"}
                                 />
                             </div>

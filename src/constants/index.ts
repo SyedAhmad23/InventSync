@@ -5,6 +5,7 @@ export const API_ENDPOINTS = {
   FORGOT_PASSWORD: "auth/forgot-password",
   RESET_PASSWORD: "auth/reset-password",
   DASHBOARD: "/client/statistics/restaurant",
-  CATEGORY: "/client/restaurants",
+  CATEGORY: "/categories",
   PRODUCT: "/products",
+  INVOICE: "/invoices",
 };

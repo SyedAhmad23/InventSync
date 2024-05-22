@@ -9,6 +9,7 @@ import { openModal, closeModal } from "@/feature/modal/modalSlice";
 import { toast } from "react-toastify";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import NoImg from "@/assets/images/no-img.png";
 import {
     Card,
     CardContent,
@@ -33,6 +34,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { File } from "lucide-react";
+import Image from "next/image";
 
 const ProductPage: React.FC = () => {
     const { data, error, isLoading } = useGetAllProductsQuery();
@@ -126,11 +128,11 @@ const ProductPage: React.FC = () => {
                                 //@ts-ignore
                                 <TableRow key={product._id}>
                                     <TableCell className="hidden sm:table-cell">
-                                        <img
+                                        <Image
                                             alt="Product image"
                                             className="aspect-square rounded-md object-cover"
                                             height="64"
-                                            src={product.image}
+                                            src={product.image || NoImg}
                                             width="64"
                                         />
                                     </TableCell>
@@ -139,7 +141,7 @@ const ProductPage: React.FC = () => {
                                         <Badge variant="outline">{product.quantity}</Badge>
                                     </TableCell>
                                     <TableCell className="hidden md:table-cell">${product.price}</TableCell>
-                                    <TableCell className="hidden md:table-cell">{product.category.id}</TableCell>
+                                    <TableCell className="hidden md:table-cell">{product.category?.name}</TableCell>
                                     <TableCell className="hidden md:table-cell">{product.description}</TableCell>
                                     <TableCell>
                                         <DropdownMenu>
