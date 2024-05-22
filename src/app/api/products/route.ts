@@ -15,7 +15,7 @@ export async function GET() {
   let products;
 
   try {
-    products = await Product.find();
+    products = await Product.find().populate("category");
   } catch (error) {
     return NextResponse.json(
       { message: "Failed to fetch products from the database" },
