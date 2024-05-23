@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/app/lib/db";
 import Category from "@/models/Category";
+import Product from "@/models/Product";
 
 export async function GET(
   req: NextRequest,
@@ -115,7 +116,12 @@ export async function DELETE(
         { status: 404 }
       );
     }
-    return NextResponse.json({ message: "Category deleted successfully" });
+
+    await Product.deleteMany({ category: id });
+
+    return NextResponse.json({
+      message: "Category and associated products deleted successfully",
+    });
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to delete the category" },
