@@ -6,7 +6,7 @@ export const dashboardApi = createApi({
   reducerPath: "dashboardApi",
   baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
   endpoints: (builder) => ({
-    getAllDashboardItems: builder.query<Dashboard[], void>({
+    getAllDashboardItems: builder.query<Dashboard, void>({
       query: () => ({
         url: API_ENDPOINTS.DASHBOARD,
         method: "GET",
@@ -15,6 +15,4 @@ export const dashboardApi = createApi({
   }),
 });
 
-export const {
-  useGetAllDashboardItemsQuery,
-} = dashboardApi;
+export const { useGetAllDashboardItemsQuery } = dashboardApi;

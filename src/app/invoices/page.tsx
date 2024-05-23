@@ -31,7 +31,12 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { useDeleteInvoiceMutation, useGetAllInvoicesQuery, useUpdateInvoiceMutation } from "@/feature/invoice/invoiceApi";
+import {
+    useDeleteInvoiceMutation,
+    useGetAllInvoicesQuery,
+    useUpdateInvoiceMutation,
+} from "@/feature/invoice/invoiceApi";
+import AddInvoiceModal from "@/components/modals/add-invoice.modal";
 
 const ProductPage: React.FC = () => {
     const { data, error, isLoading } = useGetAllInvoicesQuery();
@@ -44,13 +49,6 @@ const ProductPage: React.FC = () => {
     console.log(finaldata);
     if (isLoading) return <Layout>Loading...</Layout>;
     if (error) return <Layout>Error...</Layout>;
-
-    const handleAddProduct = () => {
-        console.log("Add Product button clicked");
-        dispatch(
-            openModal({ view: "ADD_PRODUCT", data: { title: "Add Product" } })
-        );
-    };
 
     const handleDeleteInvoice = async (id: string) => {
         try {
@@ -79,33 +77,23 @@ const ProductPage: React.FC = () => {
         dispatch(openModal({ view: "UPDATE_PRODUCT", data: { invoice: selectedInvoice } }));
     };
 
-    const togglePaymentStatus = async (invoice: Invoice) => {
-        const updatedInvoice = { ...invoice, paid: !invoice.paid };
-        try {
-            //@ts-ignore
-            await updateInvoice({ id: invoice._id, data: updatedInvoice }).unwrap();
-            toast.success("Invoice status updated successfully");
-        } catch (error) {
-            toast.error("Failed to update invoice status");
-        }
-    };
     const getTotalQuantity = (products: any[]) => {
         return products.reduce((total, product) => total + product.quantity, 0);
     };
+
     return (
         <Layout>
             <div className="flex items-center">
                 <div className="ml-auto flex items-center gap-2">
-                    <Button size="sm" className="h-8 gap-1" onClick={handleAddProduct}>
+                    <AddInvoiceModal />
+                    <Button size="sm" className="h-8 gap-1">
                         <MdAdd className="h-3.5 w-3.5" />
-                        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                            Add Invoice
-                        </span>
+                        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Add Invoice</span>
                     </Button>
                 </div>
             </div>
 
-            <Card className=" mt-10">
+            <Card className="mt-10">
                 <CardHeader>
                     <CardTitle>Invoices</CardTitle>
                     <CardDescription>
@@ -130,17 +118,9 @@ const ProductPage: React.FC = () => {
                             {finaldata?.map((invoice: Invoice) => (
                                 //@ts-ignore
                                 <TableRow key={invoice._id}>
-                                    <TableCell className="font-medium">
-                                        {getTotalQuantity(invoice.products)}
-                                    </TableCell>
+                                    <TableCell className="font-medium">{getTotalQuantity(invoice.products)}</TableCell>
                                     <TableCell>
-                                        <Button
-                                            size="sm"
-                                            onClick={() => togglePaymentStatus(invoice)}
-                                            disabled={isLoadingUpdate}
-                                        >
-                                            {invoice.paid ? "Paid" : "Unpaid"}
-                                        </Button>
+                                        <Button size="sm">Paid</Button>
                                     </TableCell>
                                     <TableCell className="hidden md:table-cell">{new Date(invoice.createdAt).toLocaleDateString()}</TableCell>
                                     <TableCell className="hidden md:table-cell">{new Date(invoice.updatedAt).toLocaleDateString()}</TableCell>
@@ -148,27 +128,13 @@ const ProductPage: React.FC = () => {
                                     <TableCell>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button
-                                                    aria-haspopup="true"
-                                                    size="icon"
-                                                    variant="ghost"
-                                                >
+                                                <Button aria-haspopup="true" size="icon" variant="ghost">
                                                     <MdRemoveRedEye className="h-4 w-4" />
                                                     <span className="sr-only">Toggle menu</span>
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                {/* <DropdownMenuItem
-                                                    onClick={() => handleUpdateCategory(category)}
-                                                >
-                                                    Edit
-                                                </DropdownMenuItem> */}
-                                                <DropdownMenuItem
-                                                    //@ts-ignore
-                                                    onClick={() => onDeleteCategory(invoice._id)}
-                                                >
-                                                    Delete
-                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => onDeleteCategory(invoice._id)}>Delete</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>

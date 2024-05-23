@@ -7,11 +7,10 @@ interface Invoice {
     totalAmount: number;
     paid: boolean;
     createdAt: string;
-    // Add any other fields if needed
 }
 
 interface TableProps {
-    data: Invoice[];
+    data: Invoice[] | undefined;
 }
 
 const RecentInvoices: React.FC<TableProps> = ({ data }) => {
@@ -24,7 +23,7 @@ const RecentInvoices: React.FC<TableProps> = ({ data }) => {
             <Table>
                 <TableHeader>
                     <TableRow>
-                    <TableHead>Id</TableHead>
+                        <TableHead>Id</TableHead>
                         <TableHead>Date</TableHead>
                         <TableHead>Amount</TableHead>
                         <TableHead>Status</TableHead>
