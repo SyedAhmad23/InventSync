@@ -7,7 +7,7 @@ export async function GET() {
   await connectToDatabase();
 
   try {
-    const invoices = await Invoice.find().populate("products.product");
+    const invoices = await Invoice.find().populate("products");
     return NextResponse.json(invoices, { status: 200 });
   } catch (error) {
     return NextResponse.json(
