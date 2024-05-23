@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     await newProduct.save();
   } catch (error) {
     return NextResponse.json(
-      { message: "Failed to create product" },
+      { message: "Category id is incorrect. Failed to create product." },
       { status: 500 }
     );
   }
