@@ -38,7 +38,7 @@ const UpdateProduct: React.FC = () => {
                 price: product?.price,
                 description: product?.description,
                 quantity: product?.quantity,
-                category: product?.category?.id || undefined,
+                category: product?.category?._id || undefined,
                 image: product?.image,
             });
             setImageInfo({ file: null, src: product?.image || "" });

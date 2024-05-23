@@ -1,15 +1,12 @@
 "use client";
 import React from "react";
 import Layout from "@/components/layout/layout";
-import { useGetAllProductsQuery, useDeleteProductMutation } from "@/feature/product/productApi";
-import { MdDelete, MdEdit, MdRemoveRedEye, MdAdd } from "react-icons/md";
-import { Category, Product } from "@/types";
+import { MdRemoveRedEye, MdAdd } from "react-icons/md";
+import { Category } from "@/types";
 import { useDispatch } from "react-redux";
 import { openModal, closeModal } from "@/feature/modal/modalSlice";
 import { toast } from "react-toastify";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import NoImg from "@/assets/images/no-img.png";
 import {
     Card,
     CardContent,
@@ -33,11 +30,10 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { File } from "lucide-react";
-import Image from "next/image";
+
 import { useDeleteCategoryMutation, useGetAllCategoriesQuery } from "@/feature/category/categoryApi";
 
-const ProductPage: React.FC = () => {
+const CategoryPage: React.FC = () => {
     const { data, error, isLoading } = useGetAllCategoriesQuery();
     const [deleteCategory] = useDeleteCategoryMutation();
     const dispatch = useDispatch();
@@ -47,10 +43,9 @@ const ProductPage: React.FC = () => {
     if (isLoading) return <Layout>Loading...</Layout>;
     if (error) return <Layout>Error...</Layout>;
 
-    const handleAddProduct = () => {
-        console.log("Add Product button clicked");
+    const handleAddCategory = () => {
         dispatch(
-            openModal({ view: "ADD_PRODUCT", data: { title: "Add Product" } })
+            openModal({ view: "ADD_CATEGORY", data: { title: "Add Category" } })
         );
     };
 
@@ -78,14 +73,14 @@ const ProductPage: React.FC = () => {
     };
 
     const handleUpdateCategory = (selectedCategory: Category) => {
-        dispatch(openModal({ view: "UPDATE_PRODUCT", data: { category: selectedCategory } }));
+        dispatch(openModal({ view: "UPDATE_CATEGORY", data: { category: selectedCategory } }));
     };
 
     return (
         <Layout>
             <div className="flex items-center">
                 <div className="ml-auto flex items-center gap-2">
-                    <Button size="sm" className="h-8 gap-1" onClick={handleAddProduct}>
+                    <Button size="sm" className="h-8 gap-1" onClick={handleAddCategory}>
                         <MdAdd className="h-3.5 w-3.5" />
                         <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                             Add Categories
@@ -106,7 +101,6 @@ const ProductPage: React.FC = () => {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Name</TableHead>
-                                <TableHead>Type</TableHead>
                                 <TableHead className="hidden md:table-cell">CreatedAt</TableHead>
                                 <TableHead className="hidden md:table-cell">UpdatedAt</TableHead>
                                 <TableHead className="hidden md:table-cell">Description</TableHead>
@@ -117,14 +111,10 @@ const ProductPage: React.FC = () => {
                         </TableHeader>
                         <TableBody>
                             {finaldata?.map((category: Category) => (
-                                //@ts-ignore
                                 <TableRow key={category._id}>
                                     <TableCell className="font-medium">{category.name}</TableCell>
-                                    <TableCell>
-                                        <Badge variant="outline">{category.type}</Badge>
-                                    </TableCell>
-                                    <TableCell className="hidden md:table-cell">{category.createdAt}</TableCell>
-                                    <TableCell className="hidden md:table-cell">{category.updatedAt}</TableCell>
+                                    <TableCell className="hidden md:table-cell">{new Date(category.createdAt).toLocaleDateString()}</TableCell>
+                                    <TableCell className="hidden md:table-cell">{new Date(category.updatedAt).toLocaleDateString()}</TableCell>
                                     <TableCell className="hidden md:table-cell">{category.description}</TableCell>
                                     <TableCell>
                                         <DropdownMenu>
@@ -139,11 +129,11 @@ const ProductPage: React.FC = () => {
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                {/* <DropdownMenuItem
+                                                <DropdownMenuItem
                                                     onClick={() => handleUpdateCategory(category)}
                                                 >
                                                     Edit
-                                                </DropdownMenuItem> */}
+                                                </DropdownMenuItem>
                                                 <DropdownMenuItem
                                                     //@ts-ignore
                                                     onClick={() => onDeleteCategory(category._id)}
@@ -163,4 +153,4 @@ const ProductPage: React.FC = () => {
     );
 };
 
-export default ProductPage;
+export default CategoryPage;

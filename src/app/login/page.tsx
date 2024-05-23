@@ -68,9 +68,14 @@ const Page = () => {
                             <span className="text-red-500">{errors.password.message}</span>
                         )}
                     </div>
-                    <Link className="cursor-pointer underline" href={ROUTES.forgotPassword}>
+                    <div className="flex justify-between">
+                    <Link className="cursor-pointer underline text-sm" href={ROUTES.forgotPassword}>
                         Forgot Password?
                     </Link>
+                    <Link className="cursor-pointer text-sm underline" href={ROUTES.signUp}>
+                        Not have an account?
+                    </Link>
+                    </div>
                     <Button type="submit" className="w-full mt-5" disabled={isLoading}>
                         {isLoading ? 'Logging in...' : 'Login'}
                     </Button>

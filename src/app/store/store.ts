@@ -2,9 +2,9 @@ import { configureStore } from "@reduxjs/toolkit";
 import { authApi } from "@/feature/auth/authApi";
 import { productApi } from "@/feature/product/productApi";
 import modalSlice from "@/feature/modal/modalSlice";
-import productSlice from "@/feature/product/productSlice";
 import { categoryApi } from "@/feature/category/categoryApi";
 import { invoiceApi } from "@/feature/invoice/invoiceApi";
+import { dashboardApi } from "@/feature/dashboard/dashboardApi";
 
 const store = configureStore({
   reducer: {
@@ -12,16 +12,18 @@ const store = configureStore({
     [productApi.reducerPath]: productApi.reducer,
     [categoryApi.reducerPath]: categoryApi.reducer,
     [invoiceApi.reducerPath]: invoiceApi.reducer,
+    [dashboardApi.reducerPath]: dashboardApi.reducer,
+
 
     modal: modalSlice,
-    product: productSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       authApi.middleware,
       productApi.middleware,
       categoryApi.middleware,
-      invoiceApi.middleware
+      invoiceApi.middleware,
+      dashboardApi.middleware,
     ),
 });
 

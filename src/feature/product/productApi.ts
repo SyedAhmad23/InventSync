@@ -13,6 +13,12 @@ export const productApi = createApi({
         method: "GET",
       }),
     }),
+    downloadProducts: builder.query<Product[], void>({
+      query: () => ({
+        url: API_ENDPOINTS.PRODUCT_DOWNLOAD,
+        method: "GET",
+      }),
+    }),
     addProduct: builder.mutation<void, FormData>({
       query: (formData) => ({
         url: API_ENDPOINTS.PRODUCT,
@@ -38,6 +44,7 @@ export const productApi = createApi({
 
 export const {
   useGetAllProductsQuery,
+  useDownloadProductsQuery,
   useAddProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,

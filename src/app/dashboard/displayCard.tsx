@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import Image, { StaticImageData } from "next/image";
 
 interface CustomCardProps {
@@ -11,8 +11,10 @@ interface CustomCardProps {
 
 const DisplayCard: React.FC<CustomCardProps> = ({ logo, text, number, className }) => {
     return (
-        <Card className={`flex items-center ${className}`}>
-            {logo && typeof logo === 'object' && (
+        <Card className={`pt-4 ${className}`}>
+            <CardContent className=" flex ">
+                <div>
+                {logo && typeof logo === 'object' && (
                 <Image
                     src={logo}
                     alt="logo"
@@ -26,14 +28,14 @@ const DisplayCard: React.FC<CustomCardProps> = ({ logo, text, number, className 
                     {React.createElement(logo, { size: 48 })}
                 </div>
             )}
-            <div className="items-center mt-4">
-                <CardContent>
-                    <h2 className="text-xl font-semibold">
+                </div>
+                <div>
+                    <CardTitle>
                         {text}
-                    </h2>
-                    <p>{number}</p>
+                    </CardTitle>
+                    <p className="text-lg font-semibold text-gray-600">{number}</p>
+                </div>
                 </CardContent>
-            </div>
         </Card>
     );
 };

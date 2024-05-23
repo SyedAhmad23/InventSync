@@ -12,6 +12,13 @@ const AddProductModal = dynamic(
 const UpdateProductModal = dynamic(
     () => import("@/components/modals/update-product.modal")
 );
+const AddCategoryModal = dynamic(
+    () => import("@/components/modals/add-category.modal")
+);
+const UpdateCategoryModal = dynamic(
+    () => import("@/components/modals/update-category.modal")
+);
+
 const DeleteModal = dynamic(
     () => import("@/components/modals/delete-permission.modal")
 );
@@ -22,6 +29,10 @@ function renderView(view: ModalViews) {
             return <AddProductModal />;
         case "UPDATE_PRODUCT":
             return <UpdateProductModal />;
+        case "ADD_CATEGORY":
+            return <AddCategoryModal />;
+        case "UPDATE_CATEGORY":
+            return <UpdateCategoryModal />;
         case "DELETE_PERMISSION":
             return <DeleteModal />;
         default:

@@ -3,38 +3,83 @@ import Layout from "@/components/layout/layout";
 import DisplayCard from "@/app/dashboard/displayCard";
 import PieChart from "@/app/dashboard/PieChart";
 import RecentInvoices from "@/app/dashboard/recentInvoices";
-import { MdMenu, MdMoney, MdProductionQuantityLimits } from "react-icons/md";
+import { MdMenu, MdMoney, MdOutlineDiscount, MdProductionQuantityLimits } from "react-icons/md";
 import { PiInvoiceDuotone } from "react-icons/pi";
+import { useGetAllDashboardItemsQuery } from "@/feature/dashboard/dashboardApi";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { GiProfit } from "react-icons/gi";
+import BarChart from "./Barchart";
 
 export default function Home() {
-    const data = [2000, 5000, 100];
-    const labels = ['Total Received Amount', 'Total Receivable', 'Total Discount Given',];
+    const { data, error, isLoading } = useGetAllDashboardItemsQuery();
+    console.log("dashboard data:", data);
+
+    const chartData = [data?.totalSales, data?.totalRecieved, data?.totalRecievables];
+
+    const finalcat = data?.totalCategories;
+    const finalProducts = data?.totalProducts;
+    const finalSales = data?.totalSales;
+    const finalInvoice = data?.totalInvoices;
+    const recentInvoices = data?.recentInvoices;
+
+    const getMonthName = (monthIndex: number) => {
+        const months = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        return months[monthIndex];
+    };
+
+    const getDaysInMonth = (month: number, year: number) => {
+        return new Date(year, month + 1, 0).getDate();
+    };
+
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    const daysInMonth = getDaysInMonth(currentMonth, currentYear);
+
+    const salesData = {
+        labels: Array.from({ length: daysInMonth }, (_, i) => `Day ${i + 1}`),
+        data: Array.from({ length: daysInMonth }, () => Math.floor(Math.random() * 100) + 1),
+    };
+
     return (
         <main className="">
             <Layout>
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
-                    <DisplayCard number={500} text="TOTAL RECEIVABLE" />
-                    <DisplayCard number={700} text="Total RECEIVED AMOUNT" />
-                    <DisplayCard number={800} text="Total DISCOUNT GIVEN" />
-                    <DisplayCard number={800} text="Total REVENUE" />
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3 mb-10">
+                    <DisplayCard logo={MdMoney} text="Total Sales" number={finalSales} />
+                    <DisplayCard logo={MdOutlineDiscount} number={0} text="Total DISCOUNT GIVEN" />
+                    <DisplayCard logo={GiProfit} number={0} text="Total REVENUE" />
 
-                    <DisplayCard logo={MdMoney} text="Total Sales" number={100} />
-                    <DisplayCard logo={MdMenu} text="Total Categories" number={100} />
-                    <DisplayCard logo={MdProductionQuantityLimits} text="Total Products" number={100} />
-                    <DisplayCard logo={PiInvoiceDuotone} text="Total Invoice" number={100} />
+                    <DisplayCard logo={MdMenu} text="Total Categories" number={finalcat} />
+                    <DisplayCard logo={MdProductionQuantityLimits} text="Total Products" number={finalProducts} />
+                    <DisplayCard logo={PiInvoiceDuotone} text="Total Invoice" number={finalInvoice} />
                 </div>
 
                 <div className="grid lg:grid-cols-3 gap-5 my-20">
-                    <div className="border-2 p-4 rounded-lg">
-                        <h3 className="text-2xl font-semibold mb-2">365 Days Sales chart
-                        </h3>
-                        <PieChart data={data} labels={labels} />
-                    </div>
-                    <div className="lg:col-span-2 border-2 p-4 rounded-lg">
-                        <h3 className="text-2xl font-semibold mb-2">Recent Invoices</h3>
-                        <RecentInvoices />
-                    </div>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Sales chart</CardTitle>
+                        </CardHeader>
+                        <PieChart data={chartData} labels={['Total Sales', 'Total Received Amount', 'Total Receivable']} />
+                    </Card>
+                    <Card className="lg:col-span-2">
+                        <CardHeader>
+                            <CardTitle>Recent Invoices</CardTitle>
+                        </CardHeader>
+                        <RecentInvoices data={recentInvoices} />
+                    </Card>
                 </div>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{`Bar Chart - ${getMonthName(currentMonth)}`}</CardTitle>
+                    </CardHeader>
+                    <BarChart
+                        data={salesData.data}
+                        labels={salesData.labels}
+                        backgroundColors={['#1A4D2E']}
+                    />
+                </Card>
             </Layout>
         </main>
     );

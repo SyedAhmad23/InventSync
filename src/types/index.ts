@@ -14,12 +14,27 @@ export interface Role {
   id: number;
   name: string;
 }
+export interface Dashboard {
+  totalCategories: number;
+  totalInvoices: number;
+  totalProducts: number;
+  totalRecievables: number;
+  totalRecieved: number;
+  totalSales: number;
+  recentInvoices: {
+      _id: string;
+      products: { name: string; }[];
+      totalAmount: number;
+      paid: boolean;
+      createdAt: string;
+  }[];
+}
 
 export interface Category {
-  id: number;
+  _id: number;
   name: string;
   description: string;
-  type: string;
+  type?: string;
   createdAt: string;
   updatedAt: string;
 }

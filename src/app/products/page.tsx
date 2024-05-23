@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Layout from "@/components/layout/layout";
-import { useGetAllProductsQuery, useDeleteProductMutation } from "@/feature/product/productApi";
+import { useGetAllProductsQuery, useDeleteProductMutation, useDownloadProductsQuery } from "@/feature/product/productApi";
 import { MdDelete, MdEdit, MdRemoveRedEye, MdAdd } from "react-icons/md";
 import { Product } from "@/types";
 import { useDispatch } from "react-redux";
@@ -22,7 +22,6 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -38,6 +37,8 @@ import Image from "next/image";
 
 const ProductPage: React.FC = () => {
     const { data, error, isLoading } = useGetAllProductsQuery();
+    const { data: downloadData, error: errorDownload, isLoading: isLoadingDownload, refetch: refetchDownload } = useDownloadProductsQuery();
+
     const [deleteProduct] = useDeleteProductMutation();
     const dispatch = useDispatch();
     //@ts-ignore
@@ -80,11 +81,15 @@ const ProductPage: React.FC = () => {
         dispatch(openModal({ view: "UPDATE_PRODUCT", data: { product: selectedProduct } }));
     };
 
+    const handleExportProducts = () => {
+        refetchDownload();
+    };
+
     return (
         <Layout>
             <div className="flex items-center">
                 <div className="ml-auto flex items-center gap-2">
-                    <Button size="sm" variant="outline" className="h-8 gap-1">
+                    <Button size="sm" variant="outline" className="h-8 gap-1" onClick={handleExportProducts}>
                         <File className="h-3.5 w-3.5" />
                         <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                             Export
@@ -128,7 +133,7 @@ const ProductPage: React.FC = () => {
                                 //@ts-ignore
                                 <TableRow key={product._id}>
                                     <TableCell className="hidden sm:table-cell">
-                                        <Image
+                                        <img
                                             alt="Product image"
                                             className="aspect-square rounded-md object-cover"
                                             height="64"
@@ -175,11 +180,6 @@ const ProductPage: React.FC = () => {
                         </TableBody>
                     </Table>
                 </CardContent>
-                <CardFooter>
-                    <div className="text-xs text-muted-foreground">
-                        Showing <strong>1-10</strong> of <strong>32</strong> products
-                    </div>
-                </CardFooter>
             </Card>
         </Layout>
     );

@@ -4,6 +4,8 @@ export type ModalViews =
   | "ADD_PRODUCT"
   | "UPDATE_PRODUCT"
   | "DELETE_PERMISSION"
+  | "ADD_CATEGORY"
+  | "UPDATE_CATEGORY"
   | null;
 
 interface ModalState {
