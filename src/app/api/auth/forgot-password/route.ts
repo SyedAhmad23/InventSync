@@ -14,7 +14,14 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function POST(req: NextRequest) {
-  await connectToDatabase();
+  try {
+    await connectToDatabase();
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Failed to connect to the database" },
+      { status: 500 }
+    );
+  }
   const { email } = await req.json();
 
   const user = await User.findOne({ email });

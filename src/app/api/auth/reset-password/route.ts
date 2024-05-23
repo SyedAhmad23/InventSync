@@ -4,7 +4,14 @@ import User from "@/models/User";
 import connectToDatabase from "@/app/lib/db";
 
 export async function POST(req: NextRequest) {
-  await connectToDatabase();
+  try {
+    await connectToDatabase();
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Failed to connect to the database" },
+      { status: 500 }
+    );
+  }
   const { token, newPassword, confirmNewPassword } = await req.json();
 
   if (newPassword !== confirmNewPassword) {
