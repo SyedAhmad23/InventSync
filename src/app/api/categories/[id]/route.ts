@@ -62,7 +62,7 @@ export async function PUT(
 
   const { name, description, type } = updateData;
 
-  if (!name || !description || !type) {
+  if (!name || !description) {
     return NextResponse.json(
       { error: "Missing required fields" },
       { status: 400 }

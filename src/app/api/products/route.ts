@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Product from "@/models/Product";
 import connectToDatabase from "@/app/lib/db";
+import Category from "@/models/Category";
 
 export async function GET() {
   try {
@@ -60,6 +61,21 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  try {
+    const categoryExists = await Category.findById(category);
+    if (!categoryExists) {
+      return NextResponse.json(
+        { message: "Category not found" },
+        { status: 404 }
+      );
+    }
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Invalid category ID format" },
+      { status: 400 }
+    );
+  }
+
   const newProduct = new Product({
     name,
     category,
@@ -73,7 +89,7 @@ export async function POST(req: NextRequest) {
     await newProduct.save();
   } catch (error) {
     return NextResponse.json(
-      { message: "Category id is incorrect. Failed to create product." },
+      { message: "Failed to create product." },
       { status: 500 }
     );
   }

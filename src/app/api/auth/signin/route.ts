@@ -17,6 +17,17 @@ export async function POST(req: NextRequest) {
   }
   const { email, password } = await req.json();
 
+  if (!email) {
+    return NextResponse.json({ message: "Email is required" }, { status: 400 });
+  }
+
+  if (!password) {
+    return NextResponse.json(
+      { message: "Password is required" },
+      { status: 400 }
+    );
+  }
+
   const user = await User.findOne({ email });
   if (!user) {
     return NextResponse.json(

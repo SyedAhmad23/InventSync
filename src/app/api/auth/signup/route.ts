@@ -14,6 +14,26 @@ export async function POST(req: NextRequest) {
   }
   const { name, email, password, confirmPassword } = await req.json();
 
+  if (!name) {
+    return NextResponse.json({ message: "Name is required" }, { status: 400 });
+  }
+  if (!email) {
+    return NextResponse.json({ message: "Email is required" }, { status: 400 });
+  }
+
+  if (!password) {
+    return NextResponse.json(
+      { message: "Password is required" },
+      { status: 400 }
+    );
+  }
+
+  if (!confirmPassword) {
+    return NextResponse.json(
+      { message: "COnfirm Password is required" },
+      { status: 400 }
+    );
+  }
   if (password !== confirmPassword) {
     return NextResponse.json(
       { error: "Passwords do not match" },

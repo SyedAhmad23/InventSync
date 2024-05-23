@@ -7,8 +7,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const result = await Invoice.aggregate([
-      //   { $match: { paid: true } }, // Filter only paid invoices
-      { $group: { _id: null, totalSales: { $sum: "$totalAmount" } } }, // Sum the totalAmount
+      { $group: { _id: null, totalSales: { $sum: "$totalAmount" } } },
     ]);
 
     const totalSales = result.length > 0 ? result[0].totalSales : 0;
