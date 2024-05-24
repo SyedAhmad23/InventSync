@@ -36,6 +36,7 @@ interface InvoiceItem {
 
 const AddInvoice: React.FC = () => {
   const { data, error, isLoading } = useGetAllProductsQuery();
+  //@ts-ignore
   const finaldata = data?.products;
 
   const [items, setItems] = useState<InvoiceItem[]>([{}]);

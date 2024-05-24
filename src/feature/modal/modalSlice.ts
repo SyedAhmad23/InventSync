@@ -8,6 +8,7 @@ export type ModalViews =
   | "UPDATE_CATEGORY"
   | "ADD_INVOICE"
   | "ADD_SUPPLIER"
+  | "UPDATE_SUPPLIER"
   | null;
 
 interface ModalState {

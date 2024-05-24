@@ -80,9 +80,14 @@ const CategoryPage: React.FC = () => {
     );
   };
 
-  // const handleUpdateSupplier = (selectedCategory: Category) => {
-  //     dispatch(openModal({ view: "UPDATE_CATEGORY", data: { category: selectedCategory } }));
-  // };
+  const handleUpdateSupplier = (selectedSUpplier: Supplier) => {
+    dispatch(
+      openModal({
+        view: "UPDATE_SUPPLIER",
+        data: { supplier: selectedSUpplier },
+      })
+    );
+  };
 
   return (
     <Layout>
@@ -109,7 +114,9 @@ const CategoryPage: React.FC = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead className="hidden md:table-cell">Contact Person</TableHead>
+                <TableHead className="hidden md:table-cell">
+                  Contact Person
+                </TableHead>
                 <TableHead className="hidden md:table-cell">Email</TableHead>
                 <TableHead className="hidden md:table-cell">Phone</TableHead>
                 <TableHead className="hidden md:table-cell">Address</TableHead>
@@ -122,7 +129,9 @@ const CategoryPage: React.FC = () => {
               {finaldata?.map((supplier: Supplier) => (
                 <TableRow key={supplier._id}>
                   <TableCell className="font-medium">{supplier.name}</TableCell>
-                  <TableHead className="hidden md:table-cell">{supplier.contact_person}</TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    {supplier.contact_person}
+                  </TableHead>
                   <TableCell className="hidden md:table-cell">
                     {supplier.email}
                   </TableCell>
@@ -145,11 +154,11 @@ const CategoryPage: React.FC = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        {/* <DropdownMenuItem
-                                                    onClick={() => handleUpdateSupplier(supplier)}
-                                                >
-                                                    Edit
-                                                </DropdownMenuItem> */}
+                        <DropdownMenuItem
+                          onClick={() => handleUpdateSupplier(supplier)}
+                        >
+                          Edit
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           //@ts-ignore
                           onClick={() => onDeleteSupplier(supplier._id)}
