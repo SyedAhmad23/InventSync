@@ -117,10 +117,10 @@ export async function DELETE(
       );
     }
 
-    await Product.deleteMany({ category: id });
+    const { deletedCount } = await Product.deleteMany({ category: id });
 
     return NextResponse.json({
-      message: "Category and associated products deleted successfully",
+      message: `Category and ${deletedCount} associated products deleted successfully`,
     });
   } catch (error) {
     return NextResponse.json(
