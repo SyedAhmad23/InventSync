@@ -4,10 +4,14 @@ const ProductSchema = new Schema(
   {
     name: { type: String, required: true },
     category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
-    description: { type: String, required: true },
-    image: { type: String, required: true },
     quantity: { type: Number, required: true },
-    price: { type: Number, required: true },
+    image: { type: String },
+    description: { type: String },
+    unitCode: { type: String, required: true },
+    buyingPrice: { type: Number, required: true },
+    sellPrice: { type: Number, required: true },
+    sku: { type: String, required: true },
+    suppliers: [{ type: Schema.Types.ObjectId, ref: "Supplier" }],
   },
   { timestamps: true }
 );
