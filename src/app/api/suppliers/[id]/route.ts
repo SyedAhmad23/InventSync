@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/app/lib/db";
 import Supplier from "@/models/Supplier";
+import Product from "@/models/Product";
 
 export async function GET(
   req: NextRequest,
@@ -83,6 +84,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const { id } = params;
   try {
     await connectToDatabase();
     const deletedSupplier = await Supplier.findByIdAndDelete(params.id);
@@ -92,7 +94,11 @@ export async function DELETE(
         { status: 404 }
       );
     }
-    return NextResponse.json({ message: "Supplier deleted successfully" });
+    const { deletedCount } = await Product.deleteMany({ suppliers: id });
+
+    return NextResponse.json({
+      message: `Supplier and ${deletedCount} associated products deleted successfully`,
+    });
   } catch (error) {
     console.error("Error deleting supplier:", error);
     return NextResponse.json(
