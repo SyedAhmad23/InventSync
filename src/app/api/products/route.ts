@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Product from "@/models/Product";
 import connectToDatabase from "@/app/lib/db";
 import Category from "@/models/Category";
+import Supplier from "@/models/Supplier";
 
 export async function GET() {
   try {
@@ -16,7 +17,7 @@ export async function GET() {
   let products;
 
   try {
-    products = await Product.find().populate("category");
+    products = await Product.find().populate("category").populate("suppliers");
   } catch (error) {
     return NextResponse.json(
       { message: "Failed to fetch products from the database" },
@@ -52,9 +53,28 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { name, category, description, image, quantity, price } = productData;
+  const {
+    name,
+    category,
+    quantity,
+    unitCode,
+    buyingPrice,
+    sellPrice,
+    sku,
+    suppliers,
+    image,
+    description,
+  } = productData;
 
-  if (!name || !category || !description || !image || !quantity || !price) {
+  if (
+    !name ||
+    !category ||
+    !quantity ||
+    !unitCode ||
+    !buyingPrice ||
+    !sellPrice ||
+    !sku
+  ) {
     return NextResponse.json(
       { message: "Missing required fields" },
       { status: 400 }
@@ -76,13 +96,32 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  try {
+    const supplierExists = await Supplier.findById(suppliers);
+    if (!supplierExists) {
+      return NextResponse.json(
+        { message: "Supplier not found" },
+        { status: 404 }
+      );
+    }
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Invalid Supplier ID format" },
+      { status: 400 }
+    );
+  }
+
   const newProduct = new Product({
     name,
     category,
-    description,
-    image,
     quantity,
-    price,
+    unitCode,
+    buyingPrice,
+    sellPrice,
+    sku,
+    suppliers,
+    image,
+    description,
   });
 
   try {

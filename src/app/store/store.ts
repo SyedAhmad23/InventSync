@@ -5,6 +5,7 @@ import modalSlice from "@/feature/modal/modalSlice";
 import { categoryApi } from "@/feature/category/categoryApi";
 import { invoiceApi } from "@/feature/invoice/invoiceApi";
 import { dashboardApi } from "@/feature/dashboard/dashboardApi";
+import { supplierApi } from "@/feature/supplier/supplierApi";
 
 const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ const store = configureStore({
     [categoryApi.reducerPath]: categoryApi.reducer,
     [invoiceApi.reducerPath]: invoiceApi.reducer,
     [dashboardApi.reducerPath]: dashboardApi.reducer,
+    [supplierApi.reducerPath]: supplierApi.reducer,
 
 
     modal: modalSlice,
@@ -24,6 +26,7 @@ const store = configureStore({
       categoryApi.middleware,
       invoiceApi.middleware,
       dashboardApi.middleware,
+      supplierApi.middleware
     ),
 });
 

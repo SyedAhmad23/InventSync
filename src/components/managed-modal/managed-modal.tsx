@@ -18,6 +18,9 @@ const AddCategoryModal = dynamic(
 const UpdateCategoryModal = dynamic(
     () => import("@/components/modals/update-category.modal")
 );
+const AddSupplierModal = dynamic(
+    () => import("@/components/modals/add-supplier.modal")
+);
 
 const DeleteModal = dynamic(
     () => import("@/components/modals/delete-permission.modal")
@@ -33,6 +36,8 @@ function renderView(view: ModalViews) {
             return <AddCategoryModal />;
         case "UPDATE_CATEGORY":
             return <UpdateCategoryModal />;
+        case "ADD_SUPPLIER":
+            return <AddSupplierModal />;
         case "DELETE_PERMISSION":
             return <DeleteModal />;
         default:

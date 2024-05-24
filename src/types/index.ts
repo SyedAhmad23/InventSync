@@ -46,11 +46,23 @@ export interface Invoice {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Supplier {
+    _id: string;
+    name: string;
+    contact_person: string;
+    email: string;
+    phone: string;
+    address: string;
+    createdAt: string;
+    updatedAt: string;
+  }
 export interface Product {
   product: string | null;
-  id: number;
+  id: string;
   name: string;
-  price: number;
+  sellPrice: number;
+  buyingPrice:number;
   description: string;
   quantity: string;
   image: string;

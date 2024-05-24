@@ -1,5 +1,3 @@
-import Product from "@/models/Product";
-
 export const API_ENDPOINTS = {
   SIGNUP: "/auth/signup",
   LOGIN: "/auth/signin",
@@ -11,4 +9,5 @@ export const API_ENDPOINTS = {
   PRODUCT: "/products",
   PRODUCT_DOWNLOAD: "/products/download",
   INVOICE: "/invoices",
+  SUPPLIER:"/suppliers"
 };

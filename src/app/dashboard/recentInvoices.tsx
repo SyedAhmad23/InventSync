@@ -1,5 +1,6 @@
 import React from 'react';
 import { Table, TableHead, TableBody, TableRow, TableCell, TableHeader } from '@/components/ui/table';
+import { CardTitle } from '@/components/ui/card';
 
 interface Invoice {
     _id: string;
@@ -15,7 +16,7 @@ interface TableProps {
 
 const RecentInvoices: React.FC<TableProps> = ({ data }) => {
     if (!data || data.length === 0) {
-        return <div>No recent invoices available</div>;
+        return <CardTitle>No recent invoices available</CardTitle>;
     }
 
     return (
