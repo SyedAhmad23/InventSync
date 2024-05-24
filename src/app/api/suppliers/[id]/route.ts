@@ -49,11 +49,11 @@ export async function PUT(
     );
   }
 
-  const { name, contact, email, phone, address } = supplierData;
+  const { name, contact_person, email, phone, address } = supplierData;
 
-  if (!name || !contact) {
+  if (!name || !contact_person) {
     return NextResponse.json(
-      { message: "Name and contact are required" },
+      { message: "Name and Contact Person are required" },
       { status: 400 }
     );
   }
@@ -61,7 +61,7 @@ export async function PUT(
   try {
     const updatedSupplier = await Supplier.findByIdAndUpdate(
       params.id,
-      { name, contact, email, phone, address },
+      { name, contact_person, email, phone, address },
       { new: true, runValidators: true }
     );
     if (!updatedSupplier) {

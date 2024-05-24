@@ -36,17 +36,23 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { name, contact, email, phone, address } = supplierData;
+  const { name, contact_person, email, phone, address } = supplierData;
 
-  if (!name || !contact) {
+  if (!name || !contact_person) {
     return NextResponse.json(
-      { message: "Name and contact are required" },
+      { message: "Name and Contact Person are required" },
       { status: 400 }
     );
   }
 
   try {
-    const newSupplier = new Supplier({ name, contact, email, phone, address });
+    const newSupplier = new Supplier({
+      name,
+      contact_person,
+      email,
+      phone,
+      address,
+    });
     await newSupplier.save();
     return NextResponse.json(newSupplier, { status: 201 });
   } catch (error) {

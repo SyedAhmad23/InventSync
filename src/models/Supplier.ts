@@ -3,9 +3,9 @@ import { Schema, model, models } from "mongoose";
 const SupplierSchema = new Schema(
   {
     name: { type: String, required: true },
-    contact: { type: String, required: true },
-    email: { type: String },
-    phone: { type: String },
+    contact_person: { type: String, required: true },
+    email: { type: String, unique: true },
+    phone: { type: String, required: true, unique: true },
     address: { type: String },
   },
   { timestamps: true }
