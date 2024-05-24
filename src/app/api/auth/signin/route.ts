@@ -7,8 +7,26 @@ import connectToDatabase from "@/app/lib/db";
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
 export async function POST(req: NextRequest) {
-  await connectToDatabase();
+  try {
+    await connectToDatabase();
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Failed to connect to the database" },
+      { status: 500 }
+    );
+  }
   const { email, password } = await req.json();
+
+  if (!email) {
+    return NextResponse.json({ message: "Email is required" }, { status: 400 });
+  }
+
+  if (!password) {
+    return NextResponse.json(
+      { message: "Password is required" },
+      { status: 400 }
+    );
+  }
 
   const user = await User.findOne({ email });
   if (!user) {

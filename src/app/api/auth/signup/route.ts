@@ -4,9 +4,36 @@ import User from "@/models/User";
 import connectToDatabase from "@/app/lib/db";
 
 export async function POST(req: NextRequest) {
-  await connectToDatabase();
+  try {
+    await connectToDatabase();
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Failed to connect to the database" },
+      { status: 500 }
+    );
+  }
   const { name, email, password, confirmPassword } = await req.json();
 
+  if (!name) {
+    return NextResponse.json({ message: "Name is required" }, { status: 400 });
+  }
+  if (!email) {
+    return NextResponse.json({ message: "Email is required" }, { status: 400 });
+  }
+
+  if (!password) {
+    return NextResponse.json(
+      { message: "Password is required" },
+      { status: 400 }
+    );
+  }
+
+  if (!confirmPassword) {
+    return NextResponse.json(
+      { message: "COnfirm Password is required" },
+      { status: 400 }
+    );
+  }
   if (password !== confirmPassword) {
     return NextResponse.json(
       { error: "Passwords do not match" },
