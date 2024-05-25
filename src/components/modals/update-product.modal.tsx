@@ -11,15 +11,23 @@ import { closeModal } from "@/feature/modal/modalSlice";
 import { useUpdateProductMutation } from "@/feature/product/productApi";
 import { Input } from "@/components/ui/input";
 import { RootState } from "@/app/store/store";
-import { Product } from "@/types";
+import { Category, Product } from "@/types";
 import NoImg from "@/assets/images/no-img.png";
+import { CustomSelect } from "../ui/custom-select";
+import { useGetAllCategoriesQuery } from "@/feature/category/categoryApi";
+import { useGetAllSuppliersQuery } from "@/feature/supplier/supplierApi";
+import { unitCodesData } from "@/app/data/unitcode";
 
 const UpdateProduct: React.FC = () => {
     const modalState = useSelector((state: RootState) => state.modal);
     const fileRef = React.useRef<HTMLInputElement>(null);
     const product = modalState.data.product as Product;
     const dispatch = useDispatch();
-
+    const { data, error, isLoading } = useGetAllCategoriesQuery();
+    //@ts-ignore
+    const finaldata = data?.categories;
+    const { data: supplier } = useGetAllSuppliersQuery();
+    const finalsupplier = supplier;
     const {
         register,
         handleSubmit,
@@ -35,11 +43,15 @@ const UpdateProduct: React.FC = () => {
         if (product) {
             reset({
                 name: product?.name,
-                price: product?.price,
                 description: product?.description,
                 quantity: product?.quantity,
                 category: product?.category?._id || undefined,
                 image: product?.image,
+                buyingPrice: product?.buyingPrice,
+                sellPrice: product?.sellPrice,
+                suppliers: product?.suppliers?._id?.toString() || undefined,
+                unitCode: product?.unitCode,
+                sku: product?.sku,
             });
             setImageInfo({ file: null, src: product?.image || "" });
         }
@@ -65,13 +77,17 @@ const UpdateProduct: React.FC = () => {
     };
 
     const onSubmit = async (data: ProductFormValues) => {
-        const { name, description, price, category, quantity, image } = data;
+        const { name, description, category, quantity, image, buyingPrice, sellPrice, suppliers, unitCode, sku } = data;
         let jsonData = {
             name,
             description,
-            price: Number(price),
-            category: Number(category),
+            category,
             quantity: Number(quantity),
+            buyingPrice: Number(buyingPrice),
+            sellPrice: Number(sellPrice),
+            suppliers,
+            unitCode,
+            sku,
         };
 
         if (imageInfo.file) {
@@ -130,11 +146,70 @@ const UpdateProduct: React.FC = () => {
                         <p className="text-base font-medium">Product Information</p>
                         <div className="grid md:grid-cols-2 gap-x-6 gap-y-4 mt-3">
                             <Input {...register("name")} id="name" label="Product Name" placeholder="Enter name" />
-                            <Input {...register("price")} id="price" type="number" label="Price" placeholder="What's the price?" />
+                            <Input {...register("buyingPrice")} id="buyingPrice" type="number" label="Buying Price" placeholder="What's the buying price?" />
+                            <Input {...register("sellPrice")} id="sellPrice" type="number" label="Selling Price" placeholder="What's the Selling price?" />
                             <div>
-                                <Input {...register("category")} id="category" label="Category" placeholder="Enter product category" />
+                                <h4 className="text-gray-700 mb-2 font-semibold">Category:</h4>
+                                <CustomSelect
+                                    items={finaldata?.map((category: Category) => category.name) || []}
+                                    placeholder="Select category"
+                                    defaultValue={product?.category?.name || ""}
+                                    onSelect={(selectedCategory) => {
+                                        const category = finaldata?.find((cat: Category) => cat.name === selectedCategory);
+                                        if (category) {
+                                            console.log("Selected Category:", category);
+                                            setValue("category", category._id);
+                                        }
+                                    }}
+                                />
+                                {errors.category && (
+                                    <span className="text-red-600 text-sm font-medium">
+                                        {errors.category.message}
+                                    </span>
+                                )}
                             </div>
                             <Input {...register("quantity")} id="quantity" type="number" label="Quantity" placeholder="How many product quantity?" />
+                            <div>
+                                <h4 className="text-gray-700 mb-2 font-semibold">Supplier:</h4>
+                                <CustomSelect
+                                    items={finalsupplier?.map((supplier) => supplier.name) || []}
+                                    placeholder="Select Supplier"
+                                    defaultValue={product?.suppliers?.name}
+                                    onSelect={(selectedSupplier) => {
+                                        const supplier = finalsupplier?.find((sup) => sup.name === selectedSupplier);
+                                        if (supplier) {
+                                            console.log("Selected Supplier:", supplier);
+                                            setValue("suppliers", supplier._id);
+                                        }
+                                    }}
+                                />
+                                {errors.suppliers && (
+                                    <span className="text-red-600 text-sm font-medium">
+                                        {errors.suppliers.message}
+                                    </span>
+                                )}
+                            </div>
+                            <div>
+                                <h4 className="text-gray-700 mb-2 font-semibold">Unit Code:</h4>
+                                <CustomSelect
+                                    items={unitCodesData.map(unit => unit.name)}
+                                    placeholder="Select unit code"
+                                    defaultValue={product?.unitCode}
+                                    onSelect={(selectedUnitCode) => {
+                                        const unitCode = unitCodesData.find(unit => unit.name === selectedUnitCode)?.code;
+                                        if (unitCode) {
+                                            console.log("Selected Unit Code:", unitCode);
+                                            setValue("unitCode", unitCode);
+                                        }
+                                    }}
+                                />
+                                {errors.unitCode && (
+                                    <span className="text-red-600 text-sm font-medium">
+                                        {errors.unitCode.message}
+                                    </span>
+                                )}
+                            </div>
+                            <Input {...register("sku")} id="sku" label="SKU" placeholder="Enter SKU" />
                         </div>
                         <div className="mt-2">
                             <label className="text-charcoalGray">Description</label>

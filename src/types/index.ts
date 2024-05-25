@@ -22,16 +22,16 @@ export interface Dashboard {
   totalRecieved: number;
   totalSales: number;
   recentInvoices: {
-      _id: string;
-      products: { name: string; }[];
-      totalAmount: number;
-      paid: boolean;
-      createdAt: string;
+    _id: string;
+    products: { name: string }[];
+    totalAmount: number;
+    paid: boolean;
+    createdAt: string;
   }[];
 }
 
 export interface Category {
-  _id: number;
+  _id: string;
   name: string;
   description: string;
   type?: string;
@@ -48,25 +48,28 @@ export interface Invoice {
 }
 
 export interface Supplier {
-    _id: string;
-    name: string;
-    contact_person: string;
-    email: string;
-    phone: string;
-    address: string;
-    createdAt: string;
-    updatedAt: string;
-  }
+  _id: string;
+  name: string;
+  contact_person: string;
+  email: string;
+  phone: string;
+  address: string;
+  createdAt: string;
+  updatedAt: string;
+}
 export interface Product {
   product: string | null;
   id: string;
   name: string;
   sellPrice: number;
-  buyingPrice:number;
+  buyingPrice: number;
   description: string;
   quantity: string;
   image: string;
   category: Category;
+  unitCode: string;
+  sku: string;
+  suppliers: Supplier;
 }
 
 export type individualStats = {

@@ -12,6 +12,9 @@ const AddProductModal = dynamic(
 const UpdateProductModal = dynamic(
   () => import("@/components/modals/update-product.modal")
 );
+const ViewProductModal = dynamic(
+  () => import("@/components/modals/view-product.modal")
+);
 const AddCategoryModal = dynamic(
   () => import("@/components/modals/add-category.modal")
 );
@@ -35,6 +38,8 @@ function renderView(view: ModalViews) {
       return <AddProductModal />;
     case "UPDATE_PRODUCT":
       return <UpdateProductModal />;
+    case "VIEW_PRODUCT":
+      return <ViewProductModal />;
     case "ADD_CATEGORY":
       return <AddCategoryModal />;
     case "UPDATE_CATEGORY":

@@ -8,6 +8,7 @@ import store from "@/app/store/store";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ManagedModal from "@/components/managed-modal/managed-modal";
+// import ProtectedRoute from "@/components/layout/protected-route";
 const inter = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -32,7 +33,9 @@ export default function RootLayout({
         )}
       >
         <Provider store={store}>
+          {/* <ProtectedRoute> */}
           {children}
+          {/* </ProtectedRoute> */}
           <ToastContainer position="top-right" autoClose={5000} />
           <ManagedModal />
         </Provider>

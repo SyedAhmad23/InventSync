@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export type ModalViews =
   | "ADD_PRODUCT"
   | "UPDATE_PRODUCT"
+  | "VIEW_PRODUCT"
   | "DELETE_PERMISSION"
   | "ADD_CATEGORY"
   | "UPDATE_CATEGORY"

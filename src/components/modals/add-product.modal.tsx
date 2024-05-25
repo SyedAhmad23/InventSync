@@ -6,14 +6,16 @@ import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { ModalContent, ModalFooter } from "../ui/modal";
-// import upload from "@/assets/images/image.svg";
 import { ProductFormSchema, ProductFormValues } from "@/schema/product-form.schema";
 import { closeModal } from "@/feature/modal/modalSlice";
 import { useAddProductMutation } from "@/feature/product/productApi";
 import { Input } from "@/components/ui/input";
-import { Category } from "@/types";
-import Select from "react-select";
+import { CustomSelect } from "@/components/ui/custom-select";
+import { unitCodesData } from "@/app/data/unitcode";
 import NoImg from "@/assets/images/no-img.png";
+import { useGetAllCategoriesQuery } from "@/feature/category/categoryApi";
+import { useGetAllSuppliersQuery } from "@/feature/supplier/supplierApi";
+import { Category } from "@/types";
 
 const AddProduct = () => {
     const fileRef = useRef<HTMLInputElement | null>(null);
@@ -21,6 +23,12 @@ const AddProduct = () => {
     const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm<ProductFormValues>({
         resolver: yupResolver(ProductFormSchema),
     });
+    const { data, error, isLoading } = useGetAllCategoriesQuery();
+    //@ts-ignore
+    const finaldata = data?.categories;
+    const { data: supplier } = useGetAllSuppliersQuery();
+    const finalsupplier = supplier;
+
     const [addProduct, { isLoading: isLoadingCreate }] = useAddProductMutation();
     const [imageInfo, setImageInfo] = useState({ file: null as File | null, src: "" });
 
@@ -33,15 +41,18 @@ const AddProduct = () => {
         }
     };
 
-
     const onSubmit = async (data: ProductFormValues) => {
-        const { name, description, price, category, quantity, image } = data;
+        const { name, description, sellPrice, category, quantity, buyingPrice, suppliers, unitCode, sku } = data;
         let jsonData = {
             name,
             description,
-            price: Number(price),
-            category: Number(category),
+            sellPrice: Number(sellPrice),
+            buyingPrice: Number(buyingPrice),
+            category,
+            suppliers,
+            unitCode,
             quantity: Number(quantity),
+            sku,
         };
         if (imageInfo.file) {
             const imageUrl = URL.createObjectURL(imageInfo.file);
@@ -62,7 +73,6 @@ const AddProduct = () => {
             toast.error("Failed to add product");
         }
     };
-
 
     return (
         <div>
@@ -86,27 +96,68 @@ const AddProduct = () => {
                         <p className="text-base font-medium">Product Information</p>
                         <div className="grid md:grid-cols-2 gap-x-6 gap-y-4 mt-3">
                             <Input {...register("name")} id="name" label="Product Name" placeholder="Enter name" />
-                            <Input {...register("price")} id="price" type="number" label="Price" placeholder="What's the price?" />
+                            <Input {...register("buyingPrice")} id="buyingPrice" type="number" label="Buying Price" placeholder="What's the buying price?" />
+                            <Input {...register("sellPrice")} id="sellPrice" type="number" label="Selling Price" placeholder="What's the Selling price?" />
                             <div>
-                                {/* <p className="text-charcoalGray mb-2">Category</p> */}
-                                {/* <Select
-                  onChange={(selectedOptions) => {
-                    setValue("category_id", Number(selectedOptions?.value));
-                  }}
-                  options={categoriesData?.data?.map((category: Category) => ({
-                    label: category.name,
-                    value: category.id.toString(),
-                  }))}
-                />
-                {errors.category_id?.message && (
-                  <span className="text-red-600 text-sm font-medium">
-                    {errors.category_id.message}
-                  </span>
-                )} */}
-                                <Input {...register("category")} id="category" label="Category" placeholder="Enter product category" />
+                                <h4 className="text-gray-700 mb-2 font-semibold">Category:</h4>
+                                <CustomSelect
+                                    items={finaldata?.map((category: Category) => category.name) || []}
+                                    placeholder="Select category"
+                                    onSelect={(selectedCategory) => {
+                                        const category = finaldata?.find((cat: Category) => cat.name === selectedCategory);
+                                        if (category) {
+                                            console.log("Selected Category:", category);
+                                            setValue("category", category._id);
+                                        }
+                                    }}
+                                />
+                                {errors.category && (
+                                    <span className="text-red-600 text-sm font-medium">
+                                        {errors.category.message}
+                                    </span>
+                                )}
                             </div>
-                            <Input {...register("quantity")} id="quantity" min={1} type="number" label="Quantity" placeholder="How many product quanity?" />
+                            <div>
+                                <h4 className="text-gray-700 mb-2 font-semibold">Supplier:</h4>
+                                <CustomSelect
+                                    items={finalsupplier?.map((supplier) => supplier.name) || []}
+                                    placeholder="Select Supplier"
+                                    onSelect={(selectedSupplier) => {
+                                        const supplier = finalsupplier?.find((sup) => sup.name === selectedSupplier);
+                                        if (supplier) {
+                                            console.log("Selected Supplier:", supplier);
+                                            setValue("suppliers", supplier._id);
+                                        }
+                                    }}
+                                />
+                                {errors.suppliers && (
+                                    <span className="text-red-600 text-sm font-medium">
+                                        {errors.suppliers.message}
+                                    </span>
+                                )}
+                            </div>
 
+                            <Input {...register("quantity")} id="quantity" min={1} type="number" label="Quantity" placeholder="How many product quantity?" />
+                            <div>
+                                <h4 className="text-gray-700 mb-2 font-semibold">Unit Code:</h4>
+                                <CustomSelect
+                                    items={unitCodesData.map(unit => unit.name)}
+                                    placeholder="Select unit code"
+                                    onSelect={(selectedUnitCode) => {
+                                        const unitCode = unitCodesData.find(unit => unit.name === selectedUnitCode)?.code;
+                                        if (unitCode) {
+                                            console.log("Selected Unit Code:", unitCode);
+                                            setValue("unitCode", unitCode);
+                                        }
+                                    }}
+                                />
+                                {errors.unitCode && (
+                                    <span className="text-red-600 text-sm font-medium">
+                                        {errors.unitCode.message}
+                                    </span>
+                                )}
+                            </div>
+                            <Input {...register("sku")} id="sku" label="SKU" placeholder="Enter SKU" />
                         </div>
                         <div className="mt-2">
                             <label className="text-charcoalGray">Description</label>

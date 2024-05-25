@@ -81,6 +81,11 @@ const ProductPage: React.FC = () => {
     );
   };
 
+  const handleViewProduct = (selectedProduct: Product) => {
+    dispatch(
+      openModal({ view: "VIEW_PRODUCT", data: { product: selectedProduct } })
+    );
+  };
   const handleUpdateProduct = (selectedProduct: Product) => {
     dispatch(
       openModal({ view: "UPDATE_PRODUCT", data: { product: selectedProduct } })
@@ -184,6 +189,11 @@ const ProductPage: React.FC = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => handleViewProduct(product)}
+                        >
+                          View
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleUpdateProduct(product)}
                         >
