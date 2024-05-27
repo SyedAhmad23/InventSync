@@ -60,7 +60,7 @@ export async function PUT(
     );
   }
 
-  const { name, description, type } = updateData;
+  const { name, description } = updateData;
 
   if (!name || !description) {
     return NextResponse.json(
@@ -72,7 +72,7 @@ export async function PUT(
   try {
     const updatedCategory = await Category.findByIdAndUpdate(
       id,
-      { name, description, type },
+      { name, description },
       { new: true }
     );
     if (!updatedCategory) {

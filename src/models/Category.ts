@@ -4,7 +4,6 @@ const CategorySchema = new Schema(
   {
     name: { type: String, required: true },
     description: { type: String, required: true },
-    type: { type: String },
   },
   { timestamps: true }
 );
