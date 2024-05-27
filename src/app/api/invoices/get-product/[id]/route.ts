@@ -18,7 +18,7 @@ export async function GET(
 
     const productDetails = {
       id: _id,
-      avialable_quantity: quantity,
+      available_quantity: quantity,
       unitCode,
       sellPrice,
     };
