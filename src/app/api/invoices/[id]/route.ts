@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/app/lib/db";
 import InvoiceModel from "@/models/Invoice";
 import Product from "@/models/Product";
+import Customer from "@/models/Customer";
 
 export async function GET(
   req: NextRequest,
@@ -52,51 +53,97 @@ export async function DELETE(
   }
 }
 
-// PUT method to update an invoice
 export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  await connectToDatabase();
+  try {
+    await connectToDatabase();
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Failed to connect to the database" },
+      { status: 500 }
+    );
+  }
 
   try {
-    const invoiceId = params.id;
-    const body = await req.json();
-    const { products, paid } = body;
-
-    if (!products || products.length === 0) {
+    const { id } = params;
+    if (!id) {
       return NextResponse.json(
-        { error: "No products provided" },
+        { error: "Invoice ID is required" },
         { status: 400 }
       );
     }
 
-    // Retrieve the existing invoice
-    const existingInvoice = await InvoiceModel.findById(invoiceId).populate(
-      "products.product"
-    );
+    const body = await req.json();
+    const { customer, customer_type, date, products, totalPaid } = body;
 
-    if (!existingInvoice) {
+    if (
+      !customer ||
+      !customer_type ||
+      !date ||
+      !products ||
+      products.length === 0
+    ) {
       return NextResponse.json(
-        { error: `Invoice with ID ${invoiceId} not found` },
-        { status: 404 }
+        {
+          error:
+            "Missing required fields: customer, date, customer_type or products",
+        },
+        { status: 400 }
       );
     }
 
-    // Revert the product quantities affected by the existing invoice
+    let customertoCreate;
+
+    if (customer_type === "new") {
+      if (!customer || !customer.customer_name || !customer.phone) {
+        return NextResponse.json(
+          { error: "Missing customer details for new customer" },
+          { status: 400 }
+        );
+      }
+
+      const newCustomer = new Customer({
+        customer_name: customer.customer_name,
+        phone: customer.phone,
+        email: customer.email,
+      });
+
+      customertoCreate = await newCustomer.save();
+    } else if (customer_type === "old") {
+      if (!customer || !customer._id) {
+        return NextResponse.json(
+          { error: "Missing customer ID for old customer" },
+          { status: 400 }
+        );
+      }
+      customertoCreate = customer;
+    } else {
+      return NextResponse.json(
+        { error: "Invalid customer_type. It should be 'new' or 'old'" },
+        { status: 400 }
+      );
+    }
+
+    const existingInvoice = await InvoiceModel.findById(id);
+    if (!existingInvoice) {
+      return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
+    }
+
+    // Restore the old quantities
     for (const item of existingInvoice.products) {
-      const { product: productId, quantity } = item;
-      await Product.findByIdAndUpdate(productId, {
-        $inc: { quantity },
+      await Product.findByIdAndUpdate(item.product, {
+        $inc: { quantity: item.quantity },
       });
     }
 
     let totalAmount = 0;
+    let total_discount = 0;
     const processedProducts = [];
 
-    // Calculate the new quantities and amounts
     for (const item of products) {
-      const { product: productId, quantity } = item;
+      const { productId, quantity, discount, discount_type } = item; // Change to productId here
 
       const product = await Product.findById(productId);
 
@@ -107,42 +154,65 @@ export async function PUT(
         );
       }
 
-      // Check if the product quantity is available
       if (quantity > product.quantity) {
         return NextResponse.json(
-          {
-            error: `Quantity of product with ID ${productId} is not available. Available quantity: ${product.quantity}`,
-          },
+          { error: `Insufficient quantity for product ID ${productId}` },
           { status: 400 }
         );
       }
 
-      const amount = product.price * quantity;
-      totalAmount += amount;
+      const rate = product.sellPrice;
+      let discountAmount = 0;
+
+      if (discount_type === "percentage") {
+        discountAmount = (rate * quantity * discount) / 100;
+      } else {
+        discountAmount = discount * quantity;
+      }
+
+      const total = rate * quantity - discountAmount;
+      totalAmount += total;
+      total_discount += discountAmount;
 
       processedProducts.push({
         product: productId,
+        availableQty: product.quantity,
         quantity,
-        amount,
+        unitCode: product.unitCode,
+        rate,
+        discount,
+        discount_type,
+        total,
       });
-    }
 
-    // Update the product quantities in the database
-    for (const item of processedProducts) {
-      const { product: productId, quantity } = item;
       await Product.findByIdAndUpdate(productId, {
         $inc: { quantity: -quantity },
       });
     }
 
-    // Update the invoice with the new data
-    existingInvoice.products = processedProducts;
-    existingInvoice.totalAmount = totalAmount;
-    existingInvoice.paid = paid;
+    const grand_total = totalAmount;
+    const return_amount = totalPaid - grand_total;
 
-    await existingInvoice.save();
+    const updatedInvoice = await InvoiceModel.findByIdAndUpdate(
+      id,
+      {
+        customer: customertoCreate._id,
+        date,
+        products: processedProducts,
+        totalAmount,
+        total_discount,
+        grand_total,
+        return_amount,
+        totalPaid,
+      },
+      { new: true }
+    );
 
-    return NextResponse.json(existingInvoice, { status: 200 });
+    if (!updatedInvoice) {
+      return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(updatedInvoice, { status: 200 });
   } catch (error) {
     console.error("Error updating invoice:", error);
     return NextResponse.json(
