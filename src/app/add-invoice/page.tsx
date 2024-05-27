@@ -22,6 +22,7 @@ import {
 import { Product } from "@/types";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { calculateTotals } from "../lib/utils";
 
 interface InvoiceItem {
   product?: Product;
@@ -35,7 +36,7 @@ interface InvoiceItem {
 }
 
 const AddInvoice: React.FC = () => {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, setError, clearErrors, formState: { errors } } = useForm();
   const [items, setItems] = useState<InvoiceItem[]>([{}]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
@@ -45,8 +46,10 @@ const AddInvoice: React.FC = () => {
   const [customerName, setCustomerName] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
   const [customerEmail, setCustomerEmail] = useState<string>("");
-  const [date, setDate] = useState<Date | null>(null);
+  const [date, setDate] = useState<Date | undefined>(undefined);
   const [totalPaid, setTotalPaid] = useState<number>(0);
+  const [totalDiscount, setTotalDiscount] = useState<number>(0);
+  const [grandTotal, setGrandTotal] = useState<number>(0);
   const { data: searchResults } = useSearchProductsQuery(searchTerm, {
     skip: !searchTerm,
   });
@@ -60,8 +63,8 @@ const AddInvoice: React.FC = () => {
   );
 
   const discountTypes = {
-    fixed: "Fixed",
-    percentage: "Percentage",
+    fixed: "fixed",
+    percentage: "percentage",
   };
 
   useEffect(() => {
@@ -71,12 +74,12 @@ const AddInvoice: React.FC = () => {
         prevItems.map((item, i) =>
           i === items.length - 1
             ? {
-                ...item,
-                product: productDetails,
-                available_quantity: productDetails.available_quantity,
-                unitCode: productDetails.unitCode,
-                price: productDetails.sellPrice.toString(),
-              }
+              ...item,
+              product: productDetails,
+              available_quantity: productDetails.available_quantity,
+              unitCode: productDetails.unitCode,
+              price: productDetails.sellPrice.toString(),
+            }
             : item
         )
       );
@@ -112,9 +115,24 @@ const AddInvoice: React.FC = () => {
       )
     );
   };
+
+  useEffect(() => {
+    calculateTotals(items, totalPaid, setError, clearErrors, discountTypes, setTotalDiscount, setGrandTotal);
+  }, [items, totalPaid]);
+
+
+
+
   const onSubmit = async () => {
+    if (totalPaid < grandTotal) {
+      setError("totalPaid", {
+        type: "manual",
+        message: "Total paid should be equal to or greater than the grand total",
+      });
+      return;
+    }
     const invoiceData = {
-      customer_type: isNewCustomer ? "new" : "existing",
+      customer_type: isNewCustomer ? "new" : "old",
       customer: {
         customer_name: customerName,
         phone: customerPhone,
@@ -122,7 +140,7 @@ const AddInvoice: React.FC = () => {
       },
       date: date ? date.toISOString() : null,
       products: items.map((item) => ({
-        productId: item.product?._id,
+        productId: item.product,
         quantity: item.quantity || "0",
         discount: item.discount || "0",
         discount_type: item.discountType || discountTypes.fixed,
@@ -139,7 +157,25 @@ const AddInvoice: React.FC = () => {
       console.error("Failed to add invoice:", error);
     }
   };
+  const handleQuantityChange = (value: string, index: number) => {
+    const newQuantity = parseFloat(value);
+    const availableQuantity = items[index].available_quantity ?? 0;
 
+    if (newQuantity > availableQuantity) {
+      setError(`quantity-${index}`, {
+        type: "manual",
+        message: "quantity should equal or less than the available quantity",
+      });
+    } else {
+      clearErrors(`quantity-${index}`);
+    }
+
+    setItems((prevItems) =>
+      prevItems.map((item, i) =>
+        i === index ? { ...item, quantity: value } : item
+      )
+    );
+  };
   return (
     <Layout>
       <h2 className="text-2xl font-bold mb-4">Add Invoice</h2>
@@ -175,7 +211,7 @@ const AddInvoice: React.FC = () => {
             {isNewCustomer ? "New Customer" : "Old Customer"}
           </Button>
         </div>
-        <DatePicker />
+        <DatePicker date={date} setDate={setDate} />
 
         <Table className="my-4">
           <TableHeader>
@@ -222,7 +258,7 @@ const AddInvoice: React.FC = () => {
                     placeholder="Available Qty"
                     id={`available_quantity-${index}`}
                     value={item.available_quantity || ""}
-                    readOnly
+                    disabled
                   />
                 </TableCell>
                 <TableCell>
@@ -230,23 +266,15 @@ const AddInvoice: React.FC = () => {
                     placeholder="Quantity"
                     id={`quantity-${index}`}
                     value={item.quantity || ""}
-                    onChange={(e) => {
-                      const newQuantity = e.target.value;
-                      if (
-                        item.available_quantity &&
-                        parseInt(newQuantity) > item.available_quantity
-                      ) {
-                        return;
-                      }
-                      setItems((prevItems) =>
-                        prevItems.map((itm, i) =>
-                          i === index ? { ...itm, quantity: newQuantity } : itm
-                        )
-                      );
-                    }}
+                    onChange={(e) => handleQuantityChange(e.target.value, index)}
                     min={1}
                     max={item.available_quantity}
                   />
+                  {errors[`quantity-${index}`] && (
+                    <span className="text-red-500 text-xs absolute w-36">
+                      {errors[`quantity-${index}`]?.message}
+                    </span>
+                  )}
                 </TableCell>
 
                 <TableCell>
@@ -254,7 +282,7 @@ const AddInvoice: React.FC = () => {
                     placeholder="Unit Code"
                     id={`unit_code-${index}`}
                     value={item.unitCode || ""}
-                    readOnly
+                    disabled
                   />
                 </TableCell>
                 <TableCell>
@@ -262,7 +290,7 @@ const AddInvoice: React.FC = () => {
                     placeholder="Price"
                     id={`price-${index}`}
                     value={item.price || ""}
-                    readOnly
+                    disabled
                   />
                 </TableCell>
                 <TableCell>
@@ -300,20 +328,25 @@ const AddInvoice: React.FC = () => {
                     value={
                       item.quantity != null && item.price != null
                         ? (
-                            (parseFloat(item.price) -
-                              (item.discountType === discountTypes.percentage
-                                ? parseFloat(item.price) *
-                                  ((parseFloat(item.discount) ?? 0) / 100)
-                                : parseFloat(item.discount) ?? 0)) *
-                            parseFloat(item.quantity)
-                          ).toFixed(2)
+                          (parseFloat(item.price) -
+                            (item.discountType === discountTypes.percentage
+                              ? parseFloat(item.price) *
+                              ((parseFloat(item.discount) ?? 0) / 100)
+                              : parseFloat(item.discount) ?? 0)) *
+                          parseFloat(item.quantity)
+                        ).toFixed(2)
                         : ""
                     }
-                    readOnly
+                    disabled
                   />
                 </TableCell>
                 <TableCell>
-                  <Button onClick={() => removeItem(index)}>Delete</Button>
+                  <Button
+                    onClick={() => removeItem(index)}
+                    disabled={items.length === 1}
+                  >
+                    Delete
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -327,8 +360,16 @@ const AddInvoice: React.FC = () => {
             placeholder="Total Discount"
             id="total_discount"
             className="mb-2"
+            value={totalDiscount.toFixed(2)}
+            readOnly
           />
-          <Input placeholder="Grand Total" id="grand_total" className="mb-2" />
+          <Input
+            placeholder="Grand Total"
+            id="grand_total"
+            className="mb-2"
+            value={grandTotal.toFixed(2)}
+            readOnly
+          />
           <Input
             placeholder="Cash Taken"
             id="cash_taken"
@@ -341,6 +382,8 @@ const AddInvoice: React.FC = () => {
             placeholder="Return Change"
             id="return_change"
             className="mb-2"
+            value={(totalPaid > grandTotal ? totalPaid - grandTotal : 0).toFixed(2)}
+            readOnly
           />
         </div>
         <div className="flex space-x-2">

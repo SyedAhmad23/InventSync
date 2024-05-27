@@ -33,7 +33,7 @@ export function CustomSelect({ items, placeholder, defaultValue, onSelect }: Pro
         <SelectValue placeholder={placeholder}>{selectedValue}</SelectValue>
       </SelectTrigger>
       <SelectContent>
-        {items.map((item) => (
+        {items?.map((item) => (
           <SelectItem key={item} value={item} className="capitalize">
             {item}
           </SelectItem>
