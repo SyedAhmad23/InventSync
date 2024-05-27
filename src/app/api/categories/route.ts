@@ -21,6 +21,10 @@ export async function POST(req: NextRequest) {
   await connectToDatabase();
   const { name, description } = await req.json();
 
+  if (!name) {
+    return NextResponse.json({ error: "Name is required" }, { status: 400 });
+  }
+
   const newCategory = new Category({
     name,
     description,
