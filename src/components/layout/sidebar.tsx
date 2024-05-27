@@ -1,4 +1,4 @@
-import { Home, LogOut, Menu, Package, Package2, Users2 } from "lucide-react";
+import { Home, LogOut, Menu, Package, Package2, Users2 , BadgeDollarSign} from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -81,7 +81,7 @@ const Sidebar = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link href="/invoices" className={linkClasses("/invoices")}>
-                  <Users2 className="h-5 w-5" />
+                  <BadgeDollarSign className="h-5 w-5" />
                   <span className="sr-only">Invoices</span>
                 </Link>
               </TooltipTrigger>
@@ -97,6 +97,17 @@ const Sidebar = () => {
                 </Link>
               </TooltipTrigger>
               <TooltipContent side="right">Suppliers</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link href="/customers" className={linkClasses("/customers")}>
+                  <Users2 className="h-5 w-5" />
+                  <span className="sr-only">Customers</span>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right">Customers</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </nav>

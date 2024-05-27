@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DatePicker } from "@/components/ui/date";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,34 +12,75 @@ import {
   TableHeader,
 } from "@/components/ui/table";
 import Layout from "@/components/layout/layout";
-import { useGetAllProductsQuery } from "@/feature/product/productApi";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Product } from "@/types";
 import { CustomSelect } from "@/components/ui/custom-select";
+import {
+  useSearchProductsQuery,
+  useGetProductDetailsQuery,
+} from "@/feature/invoice/invoiceApi";
+import { Product } from "@/types";
+import { Label } from "@/components/ui/label";
 
 interface InvoiceItem {
-  product?: string;
-  availableQuantity?: string;
+  product?: Product;
+  available_quantity?: number;
   quantity?: string;
   unitCode?: string;
   price?: string;
+  discountType?: string; // Add this property to store discount type
   discount?: string;
   total?: string;
 }
 
 const AddInvoice: React.FC = () => {
-  const { data, error, isLoading } = useGetAllProductsQuery();
-  //@ts-ignore
-  const finaldata = data?.products;
-
   const [items, setItems] = useState<InvoiceItem[]>([{}]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(
+    null
+  );
+  const [isNewCustomer, setIsNewCustomer] = useState<boolean>(true);
+  const { data: searchResults } = useSearchProductsQuery(searchTerm, {
+    skip: !searchTerm,
+  });
+
+  const { data: productDetails } = useGetProductDetailsQuery(
+    selectedProductId!,
+    {
+      skip: !selectedProductId,
+    }
+  );
+
+  const discountTypes = {
+    fixed: "Fixed",
+    percentage: "Percentage",
+  };
+
+  useEffect(() => {
+    console.log("Product Details:", productDetails);
+    if (productDetails) {
+      setItems((prevItems) =>
+        prevItems.map((item, i) =>
+          i === items.length - 1
+            ? {
+                ...item,
+                product: productDetails,
+                available_quantity: productDetails.available_quantity,
+                unitCode: productDetails.unitCode,
+                price: productDetails.sellPrice.toString(),
+              }
+            : item
+        )
+      );
+      setSelectedProductId(null);
+      setSearchTerm("");
+    }
+  }, [productDetails, items.length]);
+
+  const handleProductSelect = (product: Product) => {
+    console.log("Selected Product ID:", product._id);
+    setSelectedProductId(product._id);
+    setSearchTerm(product.name);
+    console.log("Selected Product Name:", product.name);
+  };
 
   const addItem = () => {
     setItems([...items, {}]);
@@ -50,45 +91,57 @@ const AddInvoice: React.FC = () => {
     setItems(updatedItems);
   };
 
-  const handleProductChange = (index: number, productId: string) => {
-    const selectedProduct = finaldata?.find(
-      (product: Product) => product.id === productId
+  const toggleCustomerType = () => {
+    setIsNewCustomer((prev) => !prev);
+  };
+
+  const handleDiscountTypeChange = (value: string, index: number) => {
+    setItems((prevItems) =>
+      prevItems.map((item, i) =>
+        i === index ? { ...item, discountType: value } : item
+      )
     );
-
-    if (selectedProduct) {
-      console.log(
-        "Selected Product:",
-        selectedProduct.name,
-        selectedProduct.id
-      );
-
-      const updatedItems = items.map((item, i) =>
-        i === index
-          ? {
-              ...item,
-              product: selectedProduct.id,
-              availableQuantity: selectedProduct.quantity,
-              price: selectedProduct.price,
-            }
-          : item
-      );
-      setItems(updatedItems);
-    }
   };
 
   return (
     <Layout>
       <h2 className="text-2xl font-bold mb-4">Add Invoice</h2>
       <hr className="mb-4" />
+      <div className="grid grid-cols-4 gap-5 my-5">
+        <Input
+          placeholder="Customer Name"
+          className="mb-2"
+          label="Customer Name"
+        />
+        {isNewCustomer && (
+          <>
+            <Input
+              placeholder="Customer Phone"
+              className="mb-2"
+              label="Customer Phone"
+            />
+            <Input
+              placeholder="Customer Email"
+              className="mb-2"
+              label="Customer Email"
+            />
+          </>
+        )}
+        <Button className="mt-8" onClick={toggleCustomerType}>
+          {isNewCustomer ? "New Customer" : "Old Customer"}
+        </Button>
+      </div>
       <DatePicker />
+
       <Table className="my-4">
         <TableHeader>
           <TableRow>
-            <TableCell>Product Name</TableCell>
+            <TableCell className="w-40">Product Name</TableCell>
             <TableCell>Available Qty</TableCell>
             <TableCell>Quantity</TableCell>
             <TableCell>Unit Code</TableCell>
             <TableCell>Price</TableCell>
+            <TableCell>Discount Type</TableCell>
             <TableCell>Discount/Item</TableCell>
             <TableCell>Total</TableCell>
             <TableCell>Action</TableCell>
@@ -98,41 +151,33 @@ const AddInvoice: React.FC = () => {
           {items.map((item, index) => (
             <TableRow key={index}>
               <TableCell>
-                {/* <Select
-                  value={item.product || ""}
-                  onValueChange={(value) => handleProductChange(index, value)}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue>
-                      {item.product
-                        ? finaldata?.find(
-                            (product: Product) => product.id === item.product
-                          )?.name
-                        : "Select Product"}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {finaldata?.map((product: Product) => (
-                      <SelectGroup key={product.id}>
-                        <SelectItem value={product.id}>
+                <div className="relative">
+                  <Input
+                    placeholder="Search product"
+                    className="w-40"
+                    value={item.product ? item.product.name : searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  {searchTerm && searchResults && (
+                    <ul className="fixed bg-white border mt-1 max-w-40 max-h-40 overflow-y-auto w-full z-50">
+                      {searchResults.map((product) => (
+                        <li
+                          key={product._id}
+                          onClick={() => handleProductSelect(product)}
+                          className="cursor-pointer hover:bg-gray-200 p-2"
+                        >
                           {product.name}
-                        </SelectItem>
-                      </SelectGroup>
-                    ))}
-                  </SelectContent>
-                </Select> */}
-                <CustomSelect
-                  placeholder="Select Product"
-                  items={
-                    finaldata?.map((product: Product) => product.name) || []
-                  }
-                />
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </TableCell>
               <TableCell>
                 <Input
                   placeholder="Available Qty"
                   id={`available_quantity-${index}`}
-                  value={item.availableQuantity || ""}
+                  value={item.available_quantity || ""}
                   readOnly
                 />
               </TableCell>
@@ -140,8 +185,23 @@ const AddInvoice: React.FC = () => {
                 <Input
                   placeholder="Quantity"
                   id={`quantity-${index}`}
+                  value={item.quantity || ""}
+                  onChange={(e) => {
+                    const newQuantity = e.target.value;
+                    if (
+                      item.available_quantity &&
+                      parseInt(newQuantity) > item.available_quantity
+                    ) {
+                      return;
+                    }
+                    setItems((prevItems) =>
+                      prevItems.map((itm, i) =>
+                        i === index ? { ...itm, quantity: newQuantity } : itm
+                      )
+                    );
+                  }}
                   min={1}
-                  max={item.availableQuantity}
+                  max={item.available_quantity}
                 />
               </TableCell>
               <TableCell>
@@ -149,15 +209,7 @@ const AddInvoice: React.FC = () => {
                   placeholder="Unit Code"
                   id={`unit_code-${index}`}
                   value={item.unitCode || ""}
-                  onChange={(e) =>
-                    setItems((prevItems) =>
-                      prevItems.map((item, i) =>
-                        i === index
-                          ? { ...item, unitCode: e.target.value }
-                          : item
-                      )
-                    )
-                  }
+                  readOnly
                 />
               </TableCell>
               <TableCell>
@@ -169,16 +221,26 @@ const AddInvoice: React.FC = () => {
                 />
               </TableCell>
               <TableCell>
+                <CustomSelect
+                  placeholder="Discount Type"
+                  items={[discountTypes.fixed, discountTypes.percentage]}
+                  onSelect={(value) => handleDiscountTypeChange(value, index)}
+                  value={item.discountType || discountTypes.fixed}
+                />
+              </TableCell>
+              <TableCell>
                 <Input
-                  placeholder="Discount/Item"
+                  placeholder={
+                    item.discountType === discountTypes.percentage
+                      ? "Discount (%)"
+                      : "Discount (Rs)"
+                  }
                   id={`discount-${index}`}
                   value={item.discount || ""}
                   onChange={(e) =>
                     setItems((prevItems) =>
-                      prevItems.map((item, i) =>
-                        i === index
-                          ? { ...item, discount: e.target.value }
-                          : item
+                      prevItems.map((itm, i) =>
+                        i === index ? { ...itm, discount: e.target.value } : itm
                       )
                     )
                   }
@@ -188,7 +250,14 @@ const AddInvoice: React.FC = () => {
                 <Input
                   placeholder="Total"
                   id={`total-${index}`}
-                  value={item.total || ""}
+                  value={
+                    item.total ||
+                    (item.price && item.quantity
+                      ? (
+                          parseFloat(item.price) * parseFloat(item.quantity)
+                        ).toString()
+                      : "")
+                  }
                   readOnly
                 />
               </TableCell>

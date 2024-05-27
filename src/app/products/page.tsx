@@ -149,7 +149,6 @@ const ProductPage: React.FC = () => {
             </TableHeader>
             <TableBody>
               {finaldata?.map((product: Product) => (
-                //@ts-ignore
                 <TableRow key={product._id}>
                   <TableCell className="hidden sm:table-cell">
                     <img
@@ -200,7 +199,6 @@ const ProductPage: React.FC = () => {
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          //@ts-ignore
                           onClick={() => onDeleteProduct(product._id)}
                         >
                           Delete

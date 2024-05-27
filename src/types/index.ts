@@ -38,6 +38,14 @@ export interface Category {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Customer {
+  _id: string;
+  customer_name: string;
+  email: string;
+  phone: string;
+  address: string;
+}
 export interface Invoice {
   _id: string;
   products: Product[];
@@ -59,7 +67,7 @@ export interface Supplier {
 }
 export interface Product {
   product: string | null;
-  id: string;
+  _id: string;
   name: string;
   sellPrice: number;
   buyingPrice: number;
@@ -67,6 +75,7 @@ export interface Product {
   quantity: string;
   image: string;
   category: Category;
+  available_quantity?: number;
   unitCode: string;
   sku: string;
   suppliers: Supplier;

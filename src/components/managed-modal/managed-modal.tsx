@@ -27,7 +27,12 @@ const AddSupplierModal = dynamic(
 const UpdateSupplierModal = dynamic(
   () => import("@/components/modals/update-supplier.modal")
 );
-
+const AddCustomerModal = dynamic(
+  () => import("@/components/modals/add-customer.modal")
+);
+const UpdateCustomerModal = dynamic(
+  () => import("@/components/modals/update-customer.modal")
+);
 const DeleteModal = dynamic(
   () => import("@/components/modals/delete-permission.modal")
 );
@@ -48,6 +53,10 @@ function renderView(view: ModalViews) {
       return <AddSupplierModal />;
     case "UPDATE_SUPPLIER":
       return <UpdateSupplierModal />;
+    case "ADD_CUSTOMER":
+      return <AddCustomerModal />;
+    case "UPDATE_CUSTOMER":
+      return <UpdateCustomerModal/>
     case "DELETE_PERMISSION":
       return <DeleteModal />;
     default:

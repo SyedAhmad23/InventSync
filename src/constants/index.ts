@@ -9,5 +9,6 @@ export const API_ENDPOINTS = {
   PRODUCT: "/products",
   PRODUCT_DOWNLOAD: "/products/download",
   INVOICE: "/invoices",
-  SUPPLIER:"/suppliers"
+  SUPPLIER:"/suppliers",
+  CUSTOMER:"/customers"
 };

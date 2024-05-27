@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { API_ENDPOINTS } from "@/constants";
-import { Invoice } from "@/types";
+import { Invoice, Product } from "@/types";
 
 export const invoiceApi = createApi({
   reducerPath: "invoiceApi",
@@ -32,6 +32,18 @@ export const invoiceApi = createApi({
         method: "DELETE",
       }),
     }),
+    searchProducts: builder.query<Product[], string>({
+      query: (searchTerm) => ({
+        url: `${API_ENDPOINTS.INVOICE}/search-product/${searchTerm}`,
+        method: "GET",
+      }),
+    }),
+    getProductDetails: builder.query<Product, string>({
+      query: (id) => ({
+        url: `${API_ENDPOINTS.INVOICE}/get-product/${id}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -40,4 +52,6 @@ export const {
   useAddInvoiceMutation,
   useUpdateInvoiceMutation,
   useDeleteInvoiceMutation,
+  useSearchProductsQuery,
+  useGetProductDetailsQuery,
 } = invoiceApi;

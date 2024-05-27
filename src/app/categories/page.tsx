@@ -135,7 +135,6 @@ const CategoryPage: React.FC = () => {
                                                     Edit
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
-                                                    //@ts-ignore
                                                     onClick={() => onDeleteCategory(category._id)}
                                                 >
                                                     Delete
