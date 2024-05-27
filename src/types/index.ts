@@ -53,6 +53,10 @@ export interface Invoice {
   paid: boolean;
   createdAt: string;
   updatedAt: string;
+  invoiceNumber: number;
+  return_amount: number;
+  totalPaid: number;
+  total_discount: number;
 }
 
 export interface Supplier {

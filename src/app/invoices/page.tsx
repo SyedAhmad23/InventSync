@@ -36,7 +36,6 @@ import {
   useGetAllInvoicesQuery,
   useUpdateInvoiceMutation,
 } from "@/feature/invoice/invoiceApi";
-import InvoiceModal from "@/components/modals/add-invoice.modal";
 import Link from "next/link";
 
 const ProductPage: React.FC = () => {
@@ -52,11 +51,7 @@ const ProductPage: React.FC = () => {
   if (isLoading) return <Layout>Loading...</Layout>;
   if (error) return <Layout>Error...</Layout>;
 
-  const handleAddInvoice = () => {
-    dispatch(
-      openModal({ view: "ADD_INVOICE", data: { title: "Add Invoice" } })
-    );
-  };
+
   const handleDeleteInvoice = async (id: string) => {
     try {
       await deleteInvoice({ id }).unwrap();
@@ -86,15 +81,14 @@ const ProductPage: React.FC = () => {
     );
   };
 
-  const getTotalQuantity = (products: any[]) => {
-    return products.reduce((total, product) => total + product.quantity, 0);
-  };
+  // const getTotalQuantity = (products: any[]) => {
+  //   return products.reduce((total, product) => total + product.quantity, 0);
+  // };
 
   return (
     <Layout>
       <div className="flex items-center">
         <div className="ml-auto flex items-center gap-2">
-          <InvoiceModal />
           <Link href="/add-invoice">
             <Button size="sm" className="h-8 gap-1">
               <MdAdd className="h-3.5 w-3.5" />
@@ -109,47 +103,52 @@ const ProductPage: React.FC = () => {
         <CardHeader>
           <CardTitle>Invoices</CardTitle>
           <CardDescription>
-            Manage your Categories and view their sales performance.
+            Manage your Invoices and view their sales performance.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
+                <TableHead>Invoice No</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="hidden md:table-cell">
-                  CreatedAt
-                </TableHead>
-                <TableHead className="hidden md:table-cell">
-                  UpdatedAt
-                </TableHead>
-                <TableHead className="hidden md:table-cell">
+                <TableHead >
                   Total Amount
                 </TableHead>
                 <TableHead>
-                  <span className="hidden md:table-cell">Actions</span>
+                  Total Paid
+                </TableHead>
+                <TableHead >
+                  Total Discount
+                </TableHead>
+                <TableHead >
+                  Total Return
+                </TableHead>
+                <TableHead>
+                  <span>Actions</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {finaldata?.map((invoice: Invoice) => (
-                //@ts-ignore
                 <TableRow key={invoice._id}>
                   <TableCell className="font-medium">
-                    {getTotalQuantity(invoice.products)}
+                    {invoice.invoiceNumber}
                   </TableCell>
                   <TableCell>
                     <Button size="sm">Paid</Button>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    {new Date(invoice.createdAt).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    {new Date(invoice.updatedAt).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell>
                     {invoice.totalAmount}
+                  </TableCell>
+                  <TableCell>
+                    {invoice.totalPaid}
+                  </TableCell>
+                  <TableCell>
+                    {invoice.total_discount}
+                  </TableCell>
+                  <TableCell>
+                    {invoice.return_amount}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>

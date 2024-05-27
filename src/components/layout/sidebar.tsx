@@ -1,4 +1,4 @@
-import { Home, LogOut, Menu, Package, Package2, Users2 , BadgeDollarSign} from "lucide-react";
+import { Home, LogOut, Menu, Package, Package2, Users2 , BadgeDollarSign, BookUser} from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -92,7 +92,7 @@ const Sidebar = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link href="/supplier" className={linkClasses("/suppliers")}>
-                  <Users2 className="h-5 w-5" />
+                  <BookUser className="h-5 w-5" />
                   <span className="sr-only">Suppliers</span>
                 </Link>
               </TooltipTrigger>
