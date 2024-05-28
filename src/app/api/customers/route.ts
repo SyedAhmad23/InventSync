@@ -1,13 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/app/lib/db";
-import Customer from "@/models/Customer";
+import CustomerModel from "@/models/Customer";
 
 export async function GET(req: NextRequest) {
-  await connectToDatabase();
-
   try {
-    const customers = await Customer.find();
-    return NextResponse.json(customers, { status: 200 });
+    await connectToDatabase();
+
+    const searchParams = req.nextUrl.searchParams;
+    const page = searchParams.get("page") || "1";
+    const limit = searchParams.get("limit") || "10";
+
+    const pageInt = parseInt(page, 10);
+    const limitInt = parseInt(limit, 10);
+
+    const skip = (pageInt - 1) * limitInt;
+
+    const search = searchParams.get("search");
+    const searchQuery = search
+      ? { customer_name: { $regex: search, $options: "i" } }
+      : {};
+
+    const customers = await CustomerModel.find(searchQuery)
+      .skip(skip)
+      .limit(limitInt);
+
+    const totalCustomers = await CustomerModel.countDocuments(searchQuery);
+
+    const totalPages = Math.ceil(totalCustomers / limitInt);
+
+    return NextResponse.json({
+      customers,
+      totalPages,
+      currentPage: pageInt,
+      totalCustomers,
+    });
   } catch (error) {
     console.error("Error fetching customers:", error);
     return NextResponse.json(
@@ -31,7 +57,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const newCustomer = new Customer({ customer_name, phone, email });
+    const newCustomer = new CustomerModel({ customer_name, phone, email });
 
     await newCustomer.save();
 
