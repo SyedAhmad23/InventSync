@@ -101,11 +101,11 @@ const CategoryPage: React.FC = () => {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Name</TableHead>
-                                <TableHead className="hidden md:table-cell">CreatedAt</TableHead>
-                                <TableHead className="hidden md:table-cell">UpdatedAt</TableHead>
-                                <TableHead className="hidden md:table-cell">Description</TableHead>
+                                <TableHead>CreatedAt</TableHead>
+                                <TableHead>UpdatedAt</TableHead>
+                                <TableHead>Description</TableHead>
                                 <TableHead>
-                                    <span className="hidden md:table-cell">Actions</span>
+                                    <span>Actions</span>
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
@@ -113,9 +113,9 @@ const CategoryPage: React.FC = () => {
                             {finaldata?.map((category: Category) => (
                                 <TableRow key={category._id}>
                                     <TableCell className="font-medium">{category.name}</TableCell>
-                                    <TableCell className="hidden md:table-cell">{new Date(category.createdAt).toLocaleDateString()}</TableCell>
-                                    <TableCell className="hidden md:table-cell">{new Date(category.updatedAt).toLocaleDateString()}</TableCell>
-                                    <TableCell className="hidden md:table-cell">{category.description}</TableCell>
+                                    <TableCell>{new Date(category.createdAt).toLocaleDateString()}</TableCell>
+                                    <TableCell>{new Date(category.updatedAt).toLocaleDateString()}</TableCell>
+                                    <TableCell>{category.description}</TableCell>
                                     <TableCell>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>

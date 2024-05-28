@@ -136,14 +136,14 @@ const ProductPage: React.FC = () => {
                 </TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Quantity</TableHead>
-                <TableHead className="hidden md:table-cell">Supplier Price</TableHead>
-                <TableHead className="hidden md:table-cell">Sale Price</TableHead>
-                <TableHead className="hidden md:table-cell">Category</TableHead>
-                <TableHead className="hidden md:table-cell">
+                <TableHead >Supplier Price</TableHead>
+                <TableHead >Sale Price</TableHead>
+                <TableHead >Category</TableHead>
+                <TableHead >
                   Description
                 </TableHead>
                 <TableHead>
-                  <span className="hidden md:table-cell">Actions</span>
+                  <span >Actions</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -163,16 +163,16 @@ const ProductPage: React.FC = () => {
                   <TableCell>
                     <Badge variant="outline">{product.quantity}</Badge>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell >
                     {product.buyingPrice}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell >
                     {product.sellPrice}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell >
                     {product.category?.name}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell >
                     {product.description}
                   </TableCell>
                   <TableCell>

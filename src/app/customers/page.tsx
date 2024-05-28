@@ -109,13 +109,13 @@ const CustomerPage: React.FC = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead className="hidden md:table-cell">Phone</TableHead>
-                <TableHead className="hidden md:table-cell">Email</TableHead>
-                {/* <TableHead className="hidden md:table-cell">
+                <TableHead>Phone</TableHead>
+                <TableHead>Email</TableHead>
+                {/* <TableHead>
                   Description
                 </TableHead> */}
                 <TableHead>
-                  <span className="hidden md:table-cell">Actions</span>
+                  <span>Actions</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -125,10 +125,10 @@ const CustomerPage: React.FC = () => {
                   <TableCell className="font-medium">
                     {customer.customer_name}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell>
                     {customer.phone}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell>
                     {customer.email}
                   </TableCell>
                   <TableCell>
