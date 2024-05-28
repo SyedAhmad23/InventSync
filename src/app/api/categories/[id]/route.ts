@@ -60,21 +60,19 @@ export async function PUT(
     );
   }
 
-  const { name, description, type } = updateData;
+  const { name, description } = updateData;
 
-  if (!name || !description) {
-    return NextResponse.json(
-      { error: "Missing required fields" },
-      { status: 400 }
-    );
+  if (!name) {
+    return NextResponse.json({ error: "Name is required" }, { status: 400 });
   }
 
   try {
     const updatedCategory = await Category.findByIdAndUpdate(
       id,
-      { name, description, type },
+      { name, description },
       { new: true }
     );
+
     if (!updatedCategory) {
       return NextResponse.json(
         { error: "Category not found" },

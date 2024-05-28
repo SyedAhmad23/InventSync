@@ -11,7 +11,7 @@ const ProductSchema = new Schema(
     buyingPrice: { type: Number, required: true },
     sellPrice: { type: Number, required: true },
     sku: { type: String, required: true },
-    suppliers: [{ type: Schema.Types.ObjectId, ref: "Supplier" }],
+    suppliers: { type: Schema.Types.ObjectId, ref: "Supplier" },
   },
   { timestamps: true }
 );

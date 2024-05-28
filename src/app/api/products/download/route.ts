@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/app/lib/db";
-import ProductModel from "@/models/Product";
-import { createObjectCsvWriter } from "csv-writer";
-import { join } from "path";
+import Product from "@/models/Product";
+import { createObjectCsvStringifier } from "csv-writer";
+
+interface Supplier {
+  name: string;
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -10,31 +13,54 @@ export async function GET(req: NextRequest) {
     await connectToDatabase();
 
     // Query all products from the database
-    const products = await ProductModel.find();
+    const products = await Product.find()
+      .populate("category")
+      .populate("suppliers");
 
-    // Define the file path for the CSV file
-    const filePath = join(process.cwd(), "products.csv");
-
-    // Create a CSV writer
-    const csvWriter = createObjectCsvWriter({
-      path: filePath,
+    // Create a CSV stringifier
+    const csvStringifier = createObjectCsvStringifier({
       header: [
         { id: "name", title: "Name" },
         { id: "category", title: "Category" },
-        { id: "description", title: "Description" },
-        { id: "image", title: "Image" },
         { id: "quantity", title: "Quantity" },
-        { id: "price", title: "Price" },
+        { id: "image", title: "Image" },
+        { id: "description", title: "Description" },
+        { id: "unitCode", title: "Unit Code" },
+        { id: "buyingPrice", title: "Buying Price" },
+        { id: "sellPrice", title: "Sell Price" },
+        { id: "sku", title: "SKU" },
+        { id: "suppliers", title: "Suppliers" },
       ],
     });
 
-    // Write the records to the CSV file
-    await csvWriter.writeRecords(products);
+    // Convert product data to CSV format
+    const records = products.map((product) => ({
+      name: product.name,
+      category: product.category.name, // Assuming category has a name field
+      quantity: product.quantity,
+      image: product.image,
+      description: product.description,
+      unitCode: product.unitCode,
+      buyingPrice: product.buyingPrice,
+      sellPrice: product.sellPrice,
+      sku: product.sku,
+      suppliers: product.suppliers
+        .map((supplier: Supplier) => supplier.name)
+        .join(", "), // Assuming suppliers have a name field
+    }));
 
-    console.log(filePath);
+    const csvString =
+      csvStringifier.getHeaderString() +
+      csvStringifier.stringifyRecords(records);
 
-    // Send the CSV file as a response
-    return NextResponse.json(filePath);
+    // Set response headers for file download
+    const fileName = "products.csv";
+    return new NextResponse(csvString, {
+      headers: {
+        "Content-Type": "text/csv",
+        "Content-Disposition": `attachment; filename="${fileName}"`,
+      },
+    });
   } catch (error) {
     console.error("Error downloading products:", error);
     // Return an error response if an error occurs

@@ -19,12 +19,15 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   await connectToDatabase();
-  const { name, description, type } = await req.json();
+  const { name, description } = await req.json();
+
+  if (!name) {
+    return NextResponse.json({ error: "Name is required" }, { status: 400 });
+  }
 
   const newCategory = new Category({
     name,
     description,
-    type,
   });
 
   await newCategory.save();

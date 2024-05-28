@@ -4,6 +4,13 @@ import Invoice from "@/models/Invoice";
 import Product from "@/models/Product";
 import { NextRequest, NextResponse } from "next/server";
 
+interface Product {
+  buyPrice: number;
+  sellPrice: number;
+  quantity: number;
+  discount: number;
+}
+
 export async function GET(req: NextRequest) {
   try {
     await connectToDatabase();
@@ -15,30 +22,44 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Calculate total recievables amount (totalAmount of unpaid invoices)
-    const totalRecievables = await Invoice.aggregate([
-      { $match: { paid: false } },
-      { $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } },
-    ]);
-
-    // Calculate total recieved amount (totalAmount of paid invoices)
-    const totalRecieved = await Invoice.aggregate([
-      { $match: { paid: true } },
-      { $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } },
-    ]);
-
-    // Calculate total sales (totalAmount of both paid and unpaid invoices)
     const totalSales = await Invoice.aggregate([
       { $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } },
     ]);
 
-    // Count total categories
+    const totalDiscount = await Invoice.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalDiscount: { $sum: "$total_discount" },
+        },
+      },
+    ]);
+
+    const invoices = await Invoice.find();
+    const products = await Product.find();
+    const productPriceMap = products.reduce((map, product) => {
+      map[product._id] = product.buyingPrice;
+      return map;
+    }, {});
+
+    // Calculate the total revenue
+    let totalRevenue = 0;
+    invoices.forEach((invoice) => {
+      // @ts-ignore
+      invoice.products.forEach((item) => {
+        const productId = item.product;
+        const quantity = item.quantity;
+        const buyingPrice = productPriceMap[productId];
+        if (buyingPrice !== undefined) {
+          totalRevenue += quantity * buyingPrice;
+        }
+      });
+    });
+
     const totalCategories = await Category.countDocuments();
 
-    // Count total products
     const totalProducts = await Product.countDocuments();
 
-    // Count total Invoices
     const totalInvoices = await Invoice.countDocuments();
 
     const recentInvoices = await Invoice.find()
@@ -47,11 +68,9 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       {
-        totalRecievables:
-          totalRecievables.length > 0 ? totalRecievables[0].totalAmount : 0,
-        totalRecieved:
-          totalRecieved.length > 0 ? totalRecieved[0].totalAmount : 0,
         totalSales: totalSales.length > 0 ? totalSales[0].totalAmount : 0,
+        totalRevenue,
+        totalDiscount: totalDiscount[0]?.totalDiscount || 0,
         totalCategories,
         totalProducts,
         totalInvoices,
@@ -66,4 +85,27 @@ export async function GET(req: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+function calculateTotalRevenue(invoices, products) {
+  // Create a map of productId to buyingPrice
+  const productPriceMap = products.reduce((map, product) => {
+    map[product._id] = product.buyingPrice;
+    return map;
+  }, {});
+
+  // Calculate the total revenue
+  let totalRevenue = 0;
+  invoices.forEach((invoice) => {
+    invoice.products.forEach((item) => {
+      const productId = item.product;
+      const quantity = item.quantity;
+      const buyingPrice = productPriceMap[productId];
+      if (buyingPrice !== undefined) {
+        totalRevenue += quantity * buyingPrice;
+      }
+    });
+  });
+
+  return totalRevenue;
 }
