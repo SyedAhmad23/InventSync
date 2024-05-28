@@ -42,7 +42,6 @@ export async function GET(req: NextRequest) {
       return map;
     }, {});
 
-    // Calculate the total revenue
     let totalRevenue = 0;
     invoices.forEach((invoice) => {
       // @ts-ignore
@@ -85,27 +84,4 @@ export async function GET(req: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-function calculateTotalRevenue(invoices, products) {
-  // Create a map of productId to buyingPrice
-  const productPriceMap = products.reduce((map, product) => {
-    map[product._id] = product.buyingPrice;
-    return map;
-  }, {});
-
-  // Calculate the total revenue
-  let totalRevenue = 0;
-  invoices.forEach((invoice) => {
-    invoice.products.forEach((item) => {
-      const productId = item.product;
-      const quantity = item.quantity;
-      const buyingPrice = productPriceMap[productId];
-      if (buyingPrice !== undefined) {
-        totalRevenue += quantity * buyingPrice;
-      }
-    });
-  });
-
-  return totalRevenue;
 }
