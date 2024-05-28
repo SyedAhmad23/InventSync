@@ -12,6 +12,13 @@ export const invoiceApi = createApi({
         method: "GET",
       }),
     }),
+    getInvoice: builder.query<Invoice, number>({
+      query: (id) => ({
+        url: `${API_ENDPOINTS.INVOICE}/${id}`,
+        method: "GET",
+      }),
+    }),
+
     addInvoice: builder.mutation<void, FormData>({
       query: (formData) => ({
         url: API_ENDPOINTS.INVOICE,
@@ -61,6 +68,7 @@ export const invoiceApi = createApi({
 
 export const {
   useGetAllInvoicesQuery,
+  useGetInvoiceQuery,
   useAddInvoiceMutation,
   useUpdateInvoiceMutation,
   useDeleteInvoiceMutation,

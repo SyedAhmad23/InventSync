@@ -41,6 +41,8 @@ export interface Category {
 
 export interface Customer {
   _id: string;
+  id?: string | null;
+  name?: string | null;
   customer_name: string;
   email: string;
   phone: string;

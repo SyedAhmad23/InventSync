@@ -37,13 +37,14 @@ import {
   useUpdateInvoiceMutation,
 } from "@/feature/invoice/invoiceApi";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-const ProductPage: React.FC = () => {
+const InvoicePage: React.FC = () => {
   const { data, error, isLoading } = useGetAllInvoicesQuery();
   const [deleteInvoice] = useDeleteInvoiceMutation();
   const [updateInvoice, { isLoading: isLoadingUpdate }] =
     useUpdateInvoiceMutation();
-
+  const router = useRouter();
   const dispatch = useDispatch();
   //@ts-ignore
   const finaldata = data;
@@ -76,14 +77,9 @@ const ProductPage: React.FC = () => {
   };
 
   const handleUpdateInvoice = (selectedInvoice: Invoice) => {
-    dispatch(
-      openModal({ view: "UPDATE_PRODUCT", data: { invoice: selectedInvoice } })
-    );
+    router.push(`/update-invoice?${selectedInvoice._id}`);
   };
 
-  // const getTotalQuantity = (products: any[]) => {
-  //   return products.reduce((total, product) => total + product.quantity, 0);
-  // };
 
   return (
     <Layout>
@@ -164,6 +160,11 @@ const ProductPage: React.FC = () => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
+                          onClick={() => handleUpdateInvoice(invoice)}
+                        >
+                          Update
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
                           onClick={() => onDeleteCategory(invoice._id)}
                         >
                           Delete
@@ -181,4 +182,4 @@ const ProductPage: React.FC = () => {
   );
 };
 
-export default ProductPage;
+export default InvoicePage;

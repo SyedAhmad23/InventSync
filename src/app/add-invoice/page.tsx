@@ -24,7 +24,7 @@ import {
 import { Customer, Product } from "@/types";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { calculateTotals } from "../lib/utils";
+import { calculateTotals, calculateValue } from "../lib/utils";
 
 interface InvoiceItem {
   product?: Product;
@@ -35,6 +35,7 @@ interface InvoiceItem {
   discountType?: string;
   discount?: number;
   total?: string;
+  customer?: Customer;
 }
 
 const AddInvoice: React.FC = () => {
@@ -48,7 +49,7 @@ const AddInvoice: React.FC = () => {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(
     null
   );
-  const [isNewCustomer, setIsNewCustomer] = useState<boolean>(true);
+  const [isNewCustomer, setIsNewCustomer] = useState<boolean>(false);
   const [customerName, setCustomerName] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
   const [customerEmail, setCustomerEmail] = useState<string>("");
@@ -71,12 +72,21 @@ const AddInvoice: React.FC = () => {
   const { data: searchCustoemrs } = useSearchCustomersQuery(customerSearchTerm, {
     skip: !customerSearchTerm,
   });
-  // const { data: customerDetails } = useGetCustomerDetailsQuery(
-  //   selectedCustomerId!,
-  //   {
-  //     skip: !selectedCustomerId,
-  //   }
-  // );
+
+  const handleCustomerSelect = async (customer: Customer) => {
+    console.log("Selected Customer ID:", customer.id);
+    setSelectedCustomerId(customer.id);
+    setCustomerSearchTerm(customer.name);
+    console.log("Selected Customer Name:", customer.name);
+
+    try {
+      const response = await useGetCustomerDetailsQuery(customer.id).unwrap();
+      setCustomerDetails(response);
+    } catch (error) {
+      console.error("Failed to fetch customer details:", error);
+    }
+  };
+
   useEffect(() => {
     if (selectedCustomerId) {
       const fetchCustomerDetails = async () => {
@@ -119,12 +129,6 @@ const AddInvoice: React.FC = () => {
     setProductSearchTerm(product.name);
     console.log("Selected Product Name:", product.name);
   };
-  const handleCustomerSelect = (customer: Customer) => {
-    console.log("Selected Customer ID:", customer._id);
-    setSelectedCustomerId(customer._id);
-    setCustomerSearchTerm(customer.customer_name);
-    console.log("Selected Product Name:", customer.customer_name);
-  };
 
   const addItem = () => {
     setItems([...items, {}]);
@@ -162,12 +166,11 @@ const AddInvoice: React.FC = () => {
     }
     const invoiceData = {
       customer_type: isNewCustomer ? "new" : "old",
-      customer: {
+      customer: isNewCustomer ? {
         customer_name: customerName,
         phone: customerPhone,
         email: customerEmail,
-      },
-      // : { _id: selectedCustomerId }, 
+      } : { _id: selectedCustomerId },
       date: date ? date.toISOString() : null,
       products: items.map((item) => ({
         productId: item.product && item.product.id,
@@ -195,7 +198,7 @@ const AddInvoice: React.FC = () => {
     if (newQuantity > availableQuantity) {
       setError(`quantity-${index}`, {
         type: "manual",
-        message: "Quantity should be equal or less than the available quantity",
+        message: "Quantity should be equal or less than the available qty",
       });
     } else {
       clearErrors(`quantity-${index}`);
@@ -225,20 +228,34 @@ const AddInvoice: React.FC = () => {
       <hr className="mb-4" />
       <form onSubmit={handleSubmit(onSubmit)} method="POST" action="/invoices">
         <div className="grid grid-cols-4 gap-5 my-5">
-          <Input
-            placeholder="Customer Name"
-            className="mb-2"
-            label="Customer Name"
-            value={customerSearchTerm}
-            onChange={(e) => setCustomerSearchTerm(e.target.value)}
-          />
-          {searchCustoemrs && searchCustoemrs.map((customer) => (
-            <div key={customer._id} onClick={() => handleCustomerSelect(customer)}>
-              {customer.customer_name}
-            </div>
-          ))}
+          {!isNewCustomer && (
+            <>
+              <Input
+                placeholder="Customer Name"
+                className="mb-2"
+                label="Select Customer"
+                value={customerSearchTerm}
+                onChange={(e) => setCustomerSearchTerm(e.target.value)}
+              />
+              <ul className="fixed border mt-20 bg-white max-w-40 max-h-40 overflow-y-auto w-full z-50">
+                {customerSearchTerm && searchCustoemrs?.map((customer) => (
+                  <li key={customer.id} onClick={() => handleCustomerSelect(customer)} className="cursor-pointer hover:bg-gray-200 p-2"
+                  >
+                    {customer.name}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
           {isNewCustomer && (
             <>
+              <Input
+                placeholder="Customer Name"
+                className="mb-2"
+                label="Customer Name"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+              />
               <Input
                 placeholder="Customer Phone"
                 className="mb-2"
@@ -255,8 +272,8 @@ const AddInvoice: React.FC = () => {
               />
             </>
           )}
-          <Button onClick={() => setIsNewCustomer((prev) => !prev)}>
-            {isNewCustomer ? "New Customer" : "Old Customer"}
+          <Button onClick={() => setIsNewCustomer((prev) => !prev)} className="mt-8">
+            {isNewCustomer ? "Old Customer" : "New Customer"}
           </Button>
         </div>
         <DatePicker date={date} setDate={setDate} />
@@ -319,12 +336,11 @@ const AddInvoice: React.FC = () => {
                     max={item.available_quantity}
                   />
                   {errors[`quantity-${index}`] && (
-                    <span className="text-red-500 text-xs absolute w-36">
-                      {errors[`quantity-${index}`]?.message}
+                    <span className="text-red-500 text-xs absolute w-40">
+                      {(errors[`quantity-${index}`]?.message)?.toString()}
                     </span>
                   )}
                 </TableCell>
-
                 <TableCell>
                   <Input
                     placeholder="Unit Code"
@@ -367,19 +383,7 @@ const AddInvoice: React.FC = () => {
                   <Input
                     placeholder="Total"
                     id={`total-${index}`}
-                    // value={
-                    //   item.quantity != null && item.price != null
-                    //     ? (
-                    //       (parseFloat(item.price) -
-                    //         (item.discountType === discountTypes.percentage
-                    //           ? parseFloat(item.price) *
-                    //           (item.discount ?? 0) / 100
-                    //           : item.discount ?? 0 *
-                    //       item.quantity
-                    //     ).toFixed(2)
-                    //     : 0
-                    // }
-                    value={item.total ?? 0}
+                    value={calculateValue(item)}
                     disabled
                   />
                 </TableCell>
