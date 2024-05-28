@@ -73,7 +73,8 @@ export async function POST(req: NextRequest) {
     !unitCode ||
     !buyingPrice ||
     !sellPrice ||
-    !sku
+    !sku ||
+    !suppliers
   ) {
     return NextResponse.json(
       { message: "Missing required fields" },
