@@ -3,14 +3,14 @@ import Category from "@/models/Category";
 import Invoice from "@/models/Invoice";
 import Product from "@/models/Product";
 import { NextRequest, NextResponse } from "next/server";
-import { startOfDay, endOfDay, startOfMonth, endOfMonth } from "date-fns";
-
-interface Product {
-  buyPrice: number;
-  sellPrice: number;
-  quantity: number;
-  discount: number;
-}
+import {
+  startOfDay,
+  endOfDay,
+  startOfMonth,
+  endOfMonth,
+  startOfYear,
+  endOfYear,
+} from "date-fns";
 
 export async function GET(req: NextRequest) {
   try {
@@ -39,22 +39,45 @@ export async function GET(req: NextRequest) {
     const invoices = await Invoice.find();
     const products = await Product.find();
     const productPriceMap = products.reduce((map, product) => {
-      map[product._id] = product.buyingPrice;
+      map[product._id] = {
+        buyingPrice: product.buyingPrice,
+        sellPrice: product.sellPrice,
+      };
       return map;
     }, {});
 
+    console.log("invoices", invoices);
+
     let totalRevenue = 0;
+    let totalAppliedDiscount = 0; // New variable to track total discount
+
     invoices.forEach((invoice) => {
       // @ts-ignore
       invoice.products.forEach((item) => {
-        const productId = item.product;
+        const productId = item.product.toString();
         const quantity = item.quantity;
-        const buyingPrice = productPriceMap[productId];
-        if (buyingPrice !== undefined) {
-          totalRevenue += quantity * buyingPrice;
+        const discount = item.discount;
+        const discountType = item.discount_type; // New variable for discount type
+        const productData = productPriceMap[productId];
+
+        if (productData) {
+          let revenuePerItem =
+            (productData.sellPrice - productData.buyingPrice) * quantity;
+
+          if (discountType === "fixed") {
+            totalAppliedDiscount += discount * quantity; // Track fixed discount
+          } else if (discountType === "percentage") {
+            const discountAmount = (productData.sellPrice * discount) / 100;
+            totalAppliedDiscount += discountAmount * quantity; // Track percentage discount
+          }
+
+          totalRevenue += revenuePerItem;
         }
       });
     });
+
+    // Subtract totalAppliedDiscount from totalRevenue
+    totalRevenue -= totalAppliedDiscount;
 
     const totalCategories = await Category.countDocuments();
 
@@ -66,16 +89,14 @@ export async function GET(req: NextRequest) {
       .sort({ createdAt: -1 })
       .limit(10);
 
-    // Calculate daily sales
     const today = new Date();
     const startOfToday = startOfDay(today);
     const endOfToday = endOfDay(today);
-    const dailySales = await calculateSales(startOfToday, endOfToday);
+    const dailySalesData = await calculateDailySales();
 
-    // Calculate monthly sales
-    const startOfMonthDate = startOfMonth(today);
-    const endOfMonthDate = endOfMonth(today);
-    const monthlySales = await calculateSales(startOfMonthDate, endOfMonthDate);
+    const monthlySalesData = await calculateMonthlySales();
+
+    const yearlySalesData = await calculateYearlySales();
 
     return NextResponse.json(
       {
@@ -86,8 +107,9 @@ export async function GET(req: NextRequest) {
         totalProducts,
         totalInvoices,
         recentInvoices,
-        dailySales,
-        monthlySales,
+        dailySalesData,
+        monthlySalesData,
+        yearlySalesData,
       },
       { status: 200 }
     );
@@ -100,19 +122,105 @@ export async function GET(req: NextRequest) {
   }
 }
 
-async function calculateSales(startDate: Date, endDate: Date) {
+async function calculateDailySales() {
+  const today = new Date();
+  const startOfToday = startOfDay(today);
+  const endOfToday = endOfDay(today);
+
   const sales = await Invoice.aggregate([
     {
       $match: {
-        createdAt: { $gte: startDate, $lte: endDate },
+        createdAt: { $gte: startOfToday, $lte: endOfToday },
       },
     },
     {
       $group: {
-        _id: null,
+        _id: { $dayOfMonth: "$createdAt" },
         totalSales: { $sum: "$grand_total" },
       },
     },
   ]);
-  return sales.length > 0 ? sales[0].totalSales : 0;
+
+  const labels = Array.from({ length: 31 }, (_, i) => `Day ${i + 1}`);
+  const data = Array(31).fill(0);
+
+  sales.forEach((sale) => {
+    const day = sale._id - 1; // Convert 1-based day to 0-based index
+    data[day] = sale.totalSales;
+  });
+
+  return { labels, data };
+}
+
+async function calculateMonthlySales() {
+  const today = new Date();
+  const startOfMonthDate = startOfMonth(today);
+  const endOfMonthDate = endOfMonth(today);
+
+  const sales = await Invoice.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: startOfMonthDate, $lte: endOfMonthDate },
+      },
+    },
+    {
+      $group: {
+        _id: { $dayOfMonth: "$createdAt" },
+        totalSales: { $sum: "$grand_total" },
+      },
+    },
+  ]);
+
+  const labels = Array.from({ length: 31 }, (_, i) => `Day ${i + 1}`);
+  const data = Array(31).fill(0);
+
+  sales.forEach((sale) => {
+    const day = sale._id - 1; // Convert 1-based day to 0-based index
+    data[day] = sale.totalSales;
+  });
+
+  return { labels, data };
+}
+
+async function calculateYearlySales() {
+  const today = new Date();
+  const startOfYearDate = startOfYear(today);
+  const endOfYearDate = endOfYear(today);
+
+  const sales = await Invoice.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: startOfYearDate, $lte: endOfYearDate },
+      },
+    },
+    {
+      $group: {
+        _id: { $month: "$createdAt" },
+        totalSales: { $sum: "$grand_total" },
+      },
+    },
+  ]);
+
+  const labels = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const data = Array(12).fill(0);
+
+  sales.forEach((sale) => {
+    const month = sale._id - 1; // Convert 1-based month to 0-based index
+    data[month] = sale.totalSales;
+  });
+
+  return { labels, data };
 }
