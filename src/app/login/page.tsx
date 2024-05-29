@@ -26,6 +26,7 @@ const Page = () => {
         try {
             const response = await login(data).unwrap();
             console.log('Login successful:', response);
+            toast.success('Login successful');
             updateUser(response.user, response.token);
             router.push('/dashboard');
         } catch (err: any) {
@@ -69,12 +70,12 @@ const Page = () => {
                         )}
                     </div>
                     <div className="flex justify-between">
-                    <Link className="cursor-pointer underline text-sm" href={ROUTES.forgotPassword}>
-                        Forgot Password?
-                    </Link>
-                    <Link className="cursor-pointer text-sm underline" href={ROUTES.signUp}>
-                        Not have an account?
-                    </Link>
+                        <Link className="cursor-pointer underline text-sm" href={ROUTES.forgotPassword}>
+                            Forgot Password?
+                        </Link>
+                        <Link className="cursor-pointer text-sm underline" href={ROUTES.signUp}>
+                            Not have an account?
+                        </Link>
                     </div>
                     <Button type="submit" className="w-full mt-5" disabled={isLoading}>
                         {isLoading ? 'Logging in...' : 'Login'}

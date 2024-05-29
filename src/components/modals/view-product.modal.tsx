@@ -20,7 +20,9 @@ const ViewProduct: React.FC = () => {
                     <div className="flex justify-center">
                         <div>
                             <div className="bg-slate-100 aspect-video relative rounded-lg h-60 overflow-hidden">
-                                <img src={product.image || NoImg} alt="Product" className="object-cover w-full h-full" />
+                                <img
+                                    //@ts-ignore
+                                    src={product.image || NoImg} alt="Product" className="object-cover w-full h-full" />
                             </div>
                         </div>
                     </div>

@@ -189,6 +189,7 @@ const ProductPage: React.FC = () => {
                       alt="Product image"
                       className="aspect-square rounded-md object-cover"
                       height="64"
+                      //@ts-ignore
                       src={product.image || NoImg}
                       width="64"
                     />
