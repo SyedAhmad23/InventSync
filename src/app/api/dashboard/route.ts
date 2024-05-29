@@ -5,13 +5,6 @@ import Product from "@/models/Product";
 import { NextRequest, NextResponse } from "next/server";
 import { startOfDay, endOfDay, startOfMonth, endOfMonth } from "date-fns";
 
-interface Product {
-  buyPrice: number;
-  sellPrice: number;
-  quantity: number;
-  discount: number;
-}
-
 export async function GET(req: NextRequest) {
   try {
     await connectToDatabase();
@@ -39,22 +32,45 @@ export async function GET(req: NextRequest) {
     const invoices = await Invoice.find();
     const products = await Product.find();
     const productPriceMap = products.reduce((map, product) => {
-      map[product._id] = product.buyingPrice;
+      map[product._id] = {
+        buyingPrice: product.buyingPrice,
+        sellPrice: product.sellPrice,
+      };
       return map;
     }, {});
 
+    console.log("invoices", invoices);
+
     let totalRevenue = 0;
+    let totalAppliedDiscount = 0; // New variable to track total discount
+
     invoices.forEach((invoice) => {
       // @ts-ignore
       invoice.products.forEach((item) => {
-        const productId = item.product;
+        const productId = item.product.toString();
         const quantity = item.quantity;
-        const buyingPrice = productPriceMap[productId];
-        if (buyingPrice !== undefined) {
-          totalRevenue += quantity * buyingPrice;
+        const discount = item.discount;
+        const discountType = item.discount_type; // New variable for discount type
+        const productData = productPriceMap[productId];
+
+        if (productData) {
+          let revenuePerItem =
+            (productData.sellPrice - productData.buyingPrice) * quantity;
+
+          if (discountType === "fixed") {
+            totalAppliedDiscount += discount * quantity; // Track fixed discount
+          } else if (discountType === "percentage") {
+            const discountAmount = (productData.sellPrice * discount) / 100;
+            totalAppliedDiscount += discountAmount * quantity; // Track percentage discount
+          }
+
+          totalRevenue += revenuePerItem;
         }
       });
     });
+
+    // Subtract totalAppliedDiscount from totalRevenue
+    totalRevenue -= totalAppliedDiscount;
 
     const totalCategories = await Category.countDocuments();
 
