@@ -1,10 +1,11 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Layout from "@/components/layout/layout";
 import {
   useGetAllProductsQuery,
   useDeleteProductMutation,
   useDownloadProductsQuery,
+  useImportProductsMutation,
 } from "@/feature/product/productApi";
 import { MdDelete, MdEdit, MdRemoveRedEye, MdAdd } from "react-icons/md";
 import { Product } from "@/types";
@@ -38,10 +39,14 @@ import {
 } from "@/components/ui/table";
 import { File } from "lucide-react";
 import Image from "next/image";
+import { Input } from "@/components/ui/input";
 
 const ProductPage: React.FC = () => {
   const { data, error, isLoading } = useGetAllProductsQuery();
   const { refetch: refetchDownload } = useDownloadProductsQuery();
+  const [importProducts] = useImportProductsMutation();
+
+  const [file, setFile] = useState<File | null>(null);
 
   const [deleteProduct] = useDeleteProductMutation();
   const dispatch = useDispatch();
@@ -91,7 +96,26 @@ const ProductPage: React.FC = () => {
       openModal({ view: "UPDATE_PRODUCT", data: { product: selectedProduct } })
     );
   };
-
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setFile(event.target.files[0]);
+    }
+  };
+  const handleImportProducts = async () => {
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      try {
+        await importProducts(formData).unwrap();
+        toast.success("Products imported successfully");
+        setFile(null);
+      } catch (error) {
+        toast.error("Failed to import products");
+      }
+    } else {
+      toast.error("No file selected");
+    }
+  };
   const handleExportProducts = () => {
     refetchDownload();
   };
@@ -100,6 +124,18 @@ const ProductPage: React.FC = () => {
     <Layout>
       <div className="flex items-center">
         <div className="ml-auto flex items-center gap-2">
+          <Input type="file" onChange={handleFileChange} className="h-8" />
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 gap-1"
+            onClick={handleImportProducts}
+          >
+            <File className="h-3.5 w-3.5" />
+            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+              Import
+            </span>
+          </Button>
           <Button
             size="sm"
             variant="outline"
@@ -136,14 +172,12 @@ const ProductPage: React.FC = () => {
                 </TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Quantity</TableHead>
-                <TableHead >Supplier Price</TableHead>
-                <TableHead >Sale Price</TableHead>
-                <TableHead >Category</TableHead>
-                <TableHead >
-                  Description
-                </TableHead>
+                <TableHead>Supplier Price</TableHead>
+                <TableHead>Sale Price</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Description</TableHead>
                 <TableHead>
-                  <span >Actions</span>
+                  <span>Actions</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -163,18 +197,10 @@ const ProductPage: React.FC = () => {
                   <TableCell>
                     <Badge variant="outline">{product.quantity}</Badge>
                   </TableCell>
-                  <TableCell >
-                    {product.buyingPrice}
-                  </TableCell>
-                  <TableCell >
-                    {product.sellPrice}
-                  </TableCell>
-                  <TableCell >
-                    {product.category?.name}
-                  </TableCell>
-                  <TableCell >
-                    {product.description}
-                  </TableCell>
+                  <TableCell>{product.buyingPrice}</TableCell>
+                  <TableCell>{product.sellPrice}</TableCell>
+                  <TableCell>{product.category?.name}</TableCell>
+                  <TableCell>{product.description}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

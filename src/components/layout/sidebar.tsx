@@ -1,4 +1,18 @@
-import { Home, LogOut, Menu, Package, Package2, Users2, BadgeDollarSign, BookUser, PanelLeft, LineChart, Search, Image } from "lucide-react";
+import {
+  Home,
+  LogOut,
+  Menu,
+  Package,
+  Package2,
+  Users2,
+  BadgeDollarSign,
+  BookUser,
+  PanelLeft,
+  LineChart,
+  Search,
+  Image,
+  DollarSign,
+} from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -11,9 +25,17 @@ import { usePathname, useRouter } from "next/navigation";
 import { useLogoutMutation } from "@/feature/auth/authApi";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "../ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "../ui/breadcrumb";
 import { Input } from "../ui/input";
 import { DropdownMenu, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { toast } from "react-toastify";
 
 const Sidebar = () => {
   const router = useRouter();
@@ -26,15 +48,17 @@ const Sidebar = () => {
   const handleLogout = async () => {
     try {
       await logout().unwrap();
+      toast.success("logout successfully");
       router.push("/login");
     } catch (error) {
       console.error("Failed to logout:", error);
     }
   };
   const linkClasses = (path: string) =>
-    `flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8 ${activeLink === path
-      ? "text-foreground bg-accent"
-      : "text-muted-foreground hover:text-foreground"
+    `flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8 ${
+      activeLink === path
+        ? "text-foreground bg-accent"
+        : "text-muted-foreground hover:text-foreground"
     }`;
 
   return (
@@ -157,32 +181,48 @@ const Sidebar = () => {
                 Dashboard
               </Link>
               <Link
-                href="#"
-                className="flex items-center gap-4 px-2.5 text-foreground"
+                href="/categories"
+                className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
               >
-                Orders
+                <Menu className="h-5 w-5" />
+                Categories
               </Link>
               <Link
-                href="#"
+                href="/products"
                 className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
               >
                 <Package className="h-5 w-5" />
                 Products
               </Link>
               <Link
-                href="#"
+                href="/invoices"
+                className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+              >
+                <DollarSign className="h-5 w-5" />
+                Invoices
+              </Link>
+              <Link
+                href="/supplier"
+                className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+              >
+                <BookUser className="h-5 w-5" />
+                Suppliers
+              </Link>
+              <Link
+                href="/customers"
                 className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
               >
                 <Users2 className="h-5 w-5" />
                 Customers
               </Link>
-              <Link
-                href="#"
-                className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-4 px-2.5 bottom-5 absolute text-muted-foreground hover:text-foreground"
               >
-                <LineChart className="h-5 w-5" />
-                Settings
-              </Link>
+                <LogOut className="h-5 w-5" />
+                Logout
+              </button>
             </nav>
           </SheetContent>
         </Sheet>

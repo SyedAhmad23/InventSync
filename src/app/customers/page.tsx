@@ -41,8 +41,9 @@ const CustomerPage: React.FC = () => {
   const [deleteCustomer] = useDeleteCustomerMutation();
   const dispatch = useDispatch();
   //@ts-ignore
-  const finaldata = data;
-  console.log(finaldata);
+  const finaldata = data?.customers;
+  console.log(finaldata,"final");
+
   if (isLoading) return <Layout>Loading...</Layout>;
   if (error) return <Layout>Error...</Layout>;
 
@@ -125,12 +126,8 @@ const CustomerPage: React.FC = () => {
                   <TableCell className="font-medium">
                     {customer.customer_name}
                   </TableCell>
-                  <TableCell>
-                    {customer.phone}
-                  </TableCell>
-                  <TableCell>
-                    {customer.email}
-                  </TableCell>
+                  <TableCell>{customer.phone}</TableCell>
+                  <TableCell>{customer.email}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

@@ -35,7 +35,7 @@ const DisplayCard: React.FC<CustomCardProps> = ({
           )}
         </div>
         <div>
-          <CardTitle className=" font-medium text-xl">{text}</CardTitle>
+          <CardTitle className=" font-medium text-lg">{text}</CardTitle>
           <p className="text-lg font-semibold text-gray-600">{data}</p>
         </div>
       </CardContent>

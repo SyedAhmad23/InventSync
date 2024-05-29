@@ -26,11 +26,15 @@ function ResetPassword() {
         }
         const token = searchParams.get("token");
         if (!token) {
-            toast("Invalid or missing token");
+            toast.error("Invalid or missing token");
             return;
         }
         try {
-            await resetPassword({ token, newPassword: data.newPassword, confirmNewPassword: data.confirmNewPassword }).unwrap();
+            await resetPassword({
+                token,
+                newPassword: data.newPassword,
+                confirmNewPassword: data.confirmNewPassword
+            }).unwrap();
             router.push(ROUTES.login);
         } catch (error) {
             console.error(error);

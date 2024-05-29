@@ -1,42 +1,33 @@
+// app/api/products/download/route.js
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/app/lib/db";
 import Product from "@/models/Product";
 import { createObjectCsvStringifier } from "csv-writer";
 
-interface Supplier {
-  name: string;
-}
-
 export async function GET(req: NextRequest) {
   try {
-    // Connect to the database
     await connectToDatabase();
 
-    // Query all products from the database
-    const products = await Product.find()
-      .populate("category")
-      .populate("suppliers");
+    const products = await Product.find();
 
-    // Create a CSV stringifier
     const csvStringifier = createObjectCsvStringifier({
       header: [
-        { id: "name", title: "Name" },
-        { id: "category", title: "Category" },
-        { id: "quantity", title: "Quantity" },
-        { id: "image", title: "Image" },
-        { id: "description", title: "Description" },
-        { id: "unitCode", title: "Unit Code" },
-        { id: "buyingPrice", title: "Buying Price" },
-        { id: "sellPrice", title: "Sell Price" },
-        { id: "sku", title: "SKU" },
-        { id: "suppliers", title: "Suppliers" },
+        { id: "name", title: "name" },
+        { id: "category", title: "category" },
+        { id: "quantity", title: "quantity" },
+        { id: "image", title: "image" },
+        { id: "description", title: "description" },
+        { id: "unitCode", title: "unitCode" },
+        { id: "buyingPrice", title: "buyingPrice" },
+        { id: "sellPrice", title: "sellPrice" },
+        { id: "sku", title: "sku" },
+        { id: "suppliers", title: "suppliers" },
       ],
     });
 
-    // Convert product data to CSV format
     const records = products.map((product) => ({
       name: product.name,
-      category: product.category.name, // Assuming category has a name field
+      category: product.category.name,
       quantity: product.quantity,
       image: product.image,
       description: product.description,
@@ -44,9 +35,7 @@ export async function GET(req: NextRequest) {
       buyingPrice: product.buyingPrice,
       sellPrice: product.sellPrice,
       sku: product.sku,
-      suppliers: product.suppliers
-        .map((supplier: Supplier) => supplier.name)
-        .join(", "), // Assuming suppliers have a name field
+      suppliers: product.suppliers ? product.suppliers.name : "",
     }));
 
     const csvString =

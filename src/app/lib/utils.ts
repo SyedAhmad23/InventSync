@@ -45,18 +45,20 @@ const discountTypes: {
   fixed: "fixed",
   percentage: "percentage",
 };
+
 export const calculateValue = (item) => {
   if (item.quantity != null && item.price != null) {
     const price = parseFloat(item.price);
-    const discount =
+    const quantity = parseFloat(item.quantity);
+    const totalPrice = price * quantity;
+    const discountAmount =
       item.discountType === discountTypes.percentage
-        ? (price * (item.discount ?? 0)) / 100
-        : item.discount ?? 0;
+        ? (totalPrice * (item.discount ?? 0)) / 100
+        : (item.discount ?? 0) * quantity;
+    const finalPrice = totalPrice - discountAmount;
 
-    const totalDiscount = discount * item.quantity;
-    const finalPrice = (price - totalDiscount).toFixed(2);
-
-    return finalPrice;
+    return finalPrice.toFixed(2);
   }
-  return 0;
+  return "0.00";
 };
+

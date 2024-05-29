@@ -52,7 +52,6 @@ const InvoicePage: React.FC = () => {
   if (isLoading) return <Layout>Loading...</Layout>;
   if (error) return <Layout>Error...</Layout>;
 
-
   const handleDeleteInvoice = async (id: string) => {
     try {
       await deleteInvoice({ id }).unwrap();
@@ -77,9 +76,8 @@ const InvoicePage: React.FC = () => {
   };
 
   const handleUpdateInvoice = (selectedInvoice: Invoice) => {
-    router.push(`/update-invoice?${selectedInvoice._id}`);
+    router.push(`/update-invoice?id=${selectedInvoice._id}`);
   };
-
 
   return (
     <Layout>
@@ -108,18 +106,10 @@ const InvoicePage: React.FC = () => {
               <TableRow>
                 <TableHead>Invoice No</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead >
-                  Total Amount
-                </TableHead>
-                <TableHead>
-                  Total Paid
-                </TableHead>
-                <TableHead >
-                  Total Discount
-                </TableHead>
-                <TableHead >
-                  Total Return
-                </TableHead>
+                <TableHead>Total Amount</TableHead>
+                <TableHead>Total Paid</TableHead>
+                <TableHead>Total Discount</TableHead>
+                <TableHead>Total Return</TableHead>
                 <TableHead>
                   <span>Actions</span>
                 </TableHead>
@@ -134,18 +124,10 @@ const InvoicePage: React.FC = () => {
                   <TableCell>
                     <Button size="sm">Paid</Button>
                   </TableCell>
-                  <TableCell>
-                    {invoice.totalAmount}
-                  </TableCell>
-                  <TableCell>
-                    {invoice.totalPaid}
-                  </TableCell>
-                  <TableCell>
-                    {invoice.total_discount}
-                  </TableCell>
-                  <TableCell>
-                    {invoice.return_amount}
-                  </TableCell>
+                  <TableCell>{invoice.totalAmount}</TableCell>
+                  <TableCell>{invoice.totalPaid}</TableCell>
+                  <TableCell>{invoice.total_discount}</TableCell>
+                  <TableCell>{invoice.return_amount}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -159,11 +141,11 @@ const InvoicePage: React.FC = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem
+                        {/* <DropdownMenuItem
                           onClick={() => handleUpdateInvoice(invoice)}
                         >
                           Update
-                        </DropdownMenuItem>
+                        </DropdownMenuItem> */}
                         <DropdownMenuItem
                           onClick={() => onDeleteCategory(invoice._id)}
                         >

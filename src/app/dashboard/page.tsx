@@ -27,17 +27,14 @@ export default function Home() {
   const { data, error, isLoading } = useGetAllDashboardItemsQuery();
   console.log("dashboard data:", data);
 
-  const chartData = [
-    data?.totalSales,
-    data?.totalRecieved,
-    data?.totalRecievables,
-  ];
-
   const finalcat = data?.totalCategories;
   const finalProducts = data?.totalProducts;
   const finalSales = data?.totalSales;
   const finalInvoice = data?.totalInvoices;
   const recentInvoices = data?.recentInvoices;
+  const finalDiscount = data?.totalDiscount;
+  const finalRevenue = data?.totalRevenue;
+  const chartData = [finalSales, finalDiscount, finalRevenue];
 
   const getMonthName = (monthIndex: number) => {
     const months = [
@@ -72,6 +69,7 @@ export default function Home() {
       () => Math.floor(Math.random() * 100) + 1
     ),
   };
+  console.log(salesData,"sales")
 
   const handleMonthChange = (value: string) => {
     setSelectedMonth(Number(value));
@@ -84,10 +82,14 @@ export default function Home() {
           <DisplayCard logo={MdMoney} text="Total Sales" data={finalSales} />
           <DisplayCard
             logo={MdOutlineDiscount}
-            data={0}
-            text="Total DISCOUNT GIVEN"
+            data={finalDiscount}
+            text="Total Discount Given"
           />
-          <DisplayCard logo={GiProfit} data={0} text="Total REVENUE" />
+          <DisplayCard
+            logo={GiProfit}
+            data={finalRevenue}
+            text="Total Revenue"
+          />
 
           <DisplayCard logo={MdMenu} text="Total Categories" data={finalcat} />
           <DisplayCard
@@ -141,8 +143,8 @@ export default function Home() {
               data={chartData.map((value) => value || 0)}
               labels={[
                 "Total Sales",
-                "Total Received Amount",
-                "Total Receivable",
+                "Total Discount Given",
+                "Total REVENUE",
               ]}
             />
           </Card>

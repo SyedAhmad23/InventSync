@@ -6,12 +6,14 @@ import { Product, Supplier } from "@/types";
 export const supplierApi = createApi({
   reducerPath: "supplierApi",
   baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
+  tagTypes:["Supplier"],
   endpoints: (builder) => ({
     getAllSuppliers: builder.query<Supplier[], void>({
       query: () => ({
         url: API_ENDPOINTS.SUPPLIER,
         method: "GET",
       }),
+      providesTags:["Supplier"],
     }),
     addSupplier: builder.mutation<void, FormData>({
       query: (formData) => ({
@@ -19,6 +21,7 @@ export const supplierApi = createApi({
         method: "POST",
         body: formData,
       }),
+      invalidatesTags:["Supplier"],
     }),
     updateSupplier: builder.mutation<void, { id: string; formData: FormData }>({
       query: ({ id, formData }) => ({
@@ -26,12 +29,14 @@ export const supplierApi = createApi({
         method: "PUT",
         body: formData,
       }),
+      invalidatesTags:["Supplier"],
     }),
     deleteSupplier: builder.mutation<void, { id: string }>({
       query: ({ id }) => ({
         url: `${API_ENDPOINTS.SUPPLIER}/${id}`,
         method: "DELETE",
       }),
+      invalidatesTags:["Supplier"],
     }),
   }),
 });

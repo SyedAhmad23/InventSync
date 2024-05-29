@@ -3,6 +3,7 @@ import Category from "@/models/Category";
 import Invoice from "@/models/Invoice";
 import Product from "@/models/Product";
 import { NextRequest, NextResponse } from "next/server";
+import { startOfDay, endOfDay, startOfMonth, endOfMonth } from "date-fns";
 
 interface Product {
   buyPrice: number;
@@ -65,6 +66,17 @@ export async function GET(req: NextRequest) {
       .sort({ createdAt: -1 })
       .limit(10);
 
+    // Calculate daily sales
+    const today = new Date();
+    const startOfToday = startOfDay(today);
+    const endOfToday = endOfDay(today);
+    const dailySales = await calculateSales(startOfToday, endOfToday);
+
+    // Calculate monthly sales
+    const startOfMonthDate = startOfMonth(today);
+    const endOfMonthDate = endOfMonth(today);
+    const monthlySales = await calculateSales(startOfMonthDate, endOfMonthDate);
+
     return NextResponse.json(
       {
         totalSales: totalSales.length > 0 ? totalSales[0].totalAmount : 0,
@@ -74,6 +86,8 @@ export async function GET(req: NextRequest) {
         totalProducts,
         totalInvoices,
         recentInvoices,
+        dailySales,
+        monthlySales,
       },
       { status: 200 }
     );
@@ -84,4 +98,21 @@ export async function GET(req: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+async function calculateSales(startDate: Date, endDate: Date) {
+  const sales = await Invoice.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: startDate, $lte: endDate },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalSales: { $sum: "$grand_total" },
+      },
+    },
+  ]);
+  return sales.length > 0 ? sales[0].totalSales : 0;
 }

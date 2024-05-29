@@ -114,14 +114,14 @@ const CategoryPage: React.FC = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead className="hidden md:table-cell">
+                <TableHead >
                   Contact Person
                 </TableHead>
-                <TableHead className="hidden md:table-cell">Email</TableHead>
-                <TableHead className="hidden md:table-cell">Phone</TableHead>
-                <TableHead className="hidden md:table-cell">Address</TableHead>
+                <TableHead >Email</TableHead>
+                <TableHead >Phone</TableHead>
+                <TableHead >Address</TableHead>
                 <TableHead>
-                  <span className="hidden md:table-cell">Actions</span>
+                  <span >Actions</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -129,16 +129,16 @@ const CategoryPage: React.FC = () => {
               {finaldata?.map((supplier: Supplier) => (
                 <TableRow key={supplier._id}>
                   <TableCell className="font-medium">{supplier.name}</TableCell>
-                  <TableHead className="hidden md:table-cell">
+                  <TableHead >
                     {supplier.contact_person}
                   </TableHead>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell >
                     {supplier.email}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell >
                     {supplier.phone}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell >
                     {supplier.address}
                   </TableCell>
                   <TableCell>

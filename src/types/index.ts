@@ -21,6 +21,8 @@ export interface Dashboard {
   totalRecievables: number;
   totalRecieved: number;
   totalSales: number;
+  totalDiscount: number;
+  totalRevenue: number;
   recentInvoices: {
     _id: string;
     products: { name: string }[];
@@ -49,6 +51,7 @@ export interface Customer {
   address: string;
 }
 export interface Invoice {
+  date: string | number | Date;
   _id: string;
   products: Product[];
   totalAmount: number;
@@ -58,6 +61,15 @@ export interface Invoice {
   invoiceNumber: number;
   return_amount: number;
   totalPaid: number;
+  product?: Product;
+  available_quantity?: string;
+  quantity?: number;
+  unitCode?: string;
+  price?: string;
+  discountType?: string;
+  discount?: number;
+  total?: string;
+  customer?: Customer;
   total_discount: number;
 }
 
@@ -72,6 +84,8 @@ export interface Supplier {
   updatedAt: string;
 }
 export interface Product {
+  discount: any;
+  discount_type: any;
   product: string | null;
   _id: string;
   name: string;
@@ -79,6 +93,7 @@ export interface Product {
   buyingPrice: number;
   description: string;
   quantity: string;
+  availableQty?: number;
   image: string;
   category: Category;
   available_quantity?: number;
