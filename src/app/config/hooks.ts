@@ -13,7 +13,14 @@ export const useConfig = () => {
     const id = localStorage.getItem("user_id");
 
     if (token) setUserToken(token);
-    // if (userData) setUser(JSON.parse(userData));
+    if (userData) {
+      try {
+        setUser(JSON.parse(userData));
+      } catch (error) {
+        console.error("Failed to parse user data:", error);
+        localStorage.removeItem("user"); // Clear the invalid data
+      }
+    }
     if (id) setUserId(Number(id));
   }, []);
 

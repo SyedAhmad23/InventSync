@@ -16,20 +16,20 @@ export interface Role {
 }
 export interface Dashboard {
   totalCategories: number;
-  totalInvoices: number;
   totalProducts: number;
-  totalRecievables: number;
-  totalRecieved: number;
   totalSales: number;
+  totalInvoices: number;
+  recentInvoices: any[];
   totalDiscount: number;
   totalRevenue: number;
-  recentInvoices: {
-    _id: string;
-    products: { name: string }[];
-    totalAmount: number;
-    paid: boolean;
-    createdAt: string;
-  }[];
+  monthlySalesData: {
+    labels: string[];
+    data: number[];
+  };
+  yearlySalesData: {
+    labels: string[];
+    data: number[];
+  };
 }
 
 export interface Category {

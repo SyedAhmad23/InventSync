@@ -1,32 +1,35 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useConfig } from "@/app/config/hooks";
 import Layout from "@/components/layout/layout";
 import DisplayCard from "@/app/dashboard/displayCard";
 import PieChart from "@/app/dashboard/PieChart";
 import RecentInvoices from "@/app/dashboard/recentInvoices";
-import {
-  MdMenu,
-  MdMoney,
-  MdOutlineDiscount,
-  MdProductionQuantityLimits,
-} from "react-icons/md";
+import { MdMenu, MdMoney, MdOutlineDiscount, MdProductionQuantityLimits } from "react-icons/md";
 import { PiInvoiceDuotone } from "react-icons/pi";
 import { useGetAllDashboardItemsQuery } from "@/feature/dashboard/dashboardApi";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { GiProfit } from "react-icons/gi";
-import BarChart from "./Barchart";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
+import BarChart from "@/app/dashboard/Barchart";
+import { Button } from "@/components/ui/button";
 
-export default function Home() {
+export default function Dashboard() {
+  const router = useRouter();
+  // const { userToken } = useConfig();
+
+  // useEffect(() => {
+  //   if (!userToken) {
+  //     router.replace("/login");
+  //   }
+  // }, [userToken, router]);
+
   const { data, error, isLoading } = useGetAllDashboardItemsQuery();
   console.log("dashboard data:", data);
 
+  // if (!userToken) {
+  //   return <div>Loading...</div>;
+  // }
   const finalcat = data?.totalCategories;
   const finalProducts = data?.totalProducts;
   const finalSales = data?.totalSales;
@@ -36,43 +39,33 @@ export default function Home() {
   const finalRevenue = data?.totalRevenue;
   const chartData = [finalSales, finalDiscount, finalRevenue];
 
-  const getMonthName = (monthIndex: number) => {
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-    return months[monthIndex];
+  const monthlySalesData = data?.monthlySalesData || { labels: [], data: [] };
+  const yearlySalesData = data?.yearlySalesData || { labels: [], data: [] };
+
+  const [selectedData, setSelectedData] = useState<"monthly" | "yearly">("monthly");
+
+  const handleToggle = (type: "monthly" | "yearly") => {
+    setSelectedData(type);
   };
 
-  const getDaysInMonth = (month: number, year: number) => {
-    return new Date(year, month + 1, 0).getDate();
-  };
-
-  const currentYear = new Date().getFullYear();
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-  const daysInMonth = getDaysInMonth(selectedMonth, currentYear);
-
-  const salesData = {
-    labels: Array.from({ length: daysInMonth }, (_, i) => `Day ${i + 1}`),
-    data: Array.from(
-      { length: daysInMonth },
-      () => Math.floor(Math.random() * 100) + 1
-    ),
-  };
-  console.log(salesData,"sales")
-
-  const handleMonthChange = (value: string) => {
-    setSelectedMonth(Number(value));
+  const barChartData = selectedData === "monthly" ? {
+    labels: monthlySalesData.labels,
+    datasets: [
+      {
+        label: "Monthly Sales",
+        data: monthlySalesData.data,
+        backgroundColor: "#1A4D2E",
+      }
+    ],
+  } : {
+    labels: yearlySalesData.labels,
+    datasets: [
+      {
+        label: "Yearly Sales",
+        data: yearlySalesData.data,
+        backgroundColor: "#003285",
+      }
+    ],
   };
 
   return (
@@ -90,7 +83,6 @@ export default function Home() {
             data={finalRevenue}
             text="Total Revenue"
           />
-
           <DisplayCard logo={MdMenu} text="Total Categories" data={finalcat} />
           <DisplayCard
             logo={MdProductionQuantityLimits}
@@ -105,33 +97,27 @@ export default function Home() {
         </div>
         <Card>
           <CardHeader>
-            <div className="flex justify-between">
-              <div>
-                <CardTitle>Monthly Sales</CardTitle>
-              </div>
-              <div>
-                <Select
-                  value={selectedMonth.toString()}
-                  onValueChange={handleMonthChange}
+            <div className="flex justify-between items-center">
+              <CardTitle>Sales Data</CardTitle>
+              <div className="gap-2 flex">
+                <Button
+                  className={selectedData === "monthly" ? "bg-gray-200" : ""}
+                  onClick={() => handleToggle("monthly")}
                 >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select Month" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Array.from({ length: 12 }).map((_, index) => (
-                      <SelectItem key={index} value={index.toString()}>
-                        {getMonthName(index)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  Monthly
+                </Button>
+                <Button
+                  className={selectedData === "yearly" ? "bg-gray-200" : ""}
+                  onClick={() => handleToggle("yearly")}
+                >
+                  Yearly
+                </Button>
               </div>
             </div>
           </CardHeader>
           <BarChart
-            data={salesData.data}
-            labels={salesData.labels}
-            backgroundColors={["#1A4D2E"]}
+            datasets={barChartData.datasets}
+            labels={barChartData.labels}
           />
         </Card>
         <div className="grid lg:grid-cols-3 gap-5 my-20">

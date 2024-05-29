@@ -5,22 +5,14 @@ import { Chart, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from '
 Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 interface BarChartProps {
-    data: number[];
+    datasets: { data: number[]; label: string; backgroundColor: string }[];
     labels: string[];
-    backgroundColors?: string[];
 }
 
-const BarChart: React.FC<BarChartProps> = ({ data, labels, backgroundColors }) => {
-    const defaultColors = ['#1A4D2E', '#003285', '#FF8911'];
+const BarChart: React.FC<BarChartProps> = ({ datasets, labels }) => {
     const chartData = {
         labels: labels,
-        datasets: [
-            {
-                data: data,
-                backgroundColor: backgroundColors || defaultColors,
-                hoverBackgroundColor: backgroundColors || defaultColors,
-            },
-        ],
+        datasets: datasets,
     };
 
     const options = {
@@ -34,12 +26,12 @@ const BarChart: React.FC<BarChartProps> = ({ data, labels, backgroundColors }) =
         },
         plugins: {
             legend: {
-                display: false,
+                display: true,
             },
             tooltip: {
                 callbacks: {
                     label: function (context: any) {
-                        const label = context.label || '';
+                        const label = context.dataset.label || '';
                         const value = context.raw || 0;
                         return `${label}: ${value.toFixed(2)}`;
                     },

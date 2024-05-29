@@ -11,8 +11,12 @@ export default function Home() {
   const { userToken } = useConfig();
 
   useEffect(() => {
-    router.replace("/dashboard");
-  }, [router]);
+    if (!userToken) {
+      router.replace("/login");
+    } else {
+      router.replace("/dashboard");
+    }
+  }, [userToken, router]);
 
   return <div></div>;
 }

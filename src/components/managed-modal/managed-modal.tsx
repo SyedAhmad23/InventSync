@@ -21,12 +21,6 @@ const AddCategoryModal = dynamic(
 const UpdateCategoryModal = dynamic(
   () => import("@/components/modals/update-category.modal")
 );
-const AddInvoiceModal = dynamic(
-  () => import("@/app/add-invoice/page")
-);
-const UpdateInvoiceModal = dynamic(
-  () => import("@/app/update-invoice/page")
-);
 const AddSupplierModal = dynamic(
   () => import("@/components/modals/add-supplier.modal")
 );
@@ -63,10 +57,6 @@ function renderView(view: ModalViews) {
       return <AddCustomerModal />;
     case "UPDATE_CUSTOMER":
       return <UpdateCustomerModal />
-    case "ADD_INVOICE":
-      return <AddInvoiceModal />;
-    case "UPDATE_INVOICE":
-      return <UpdateInvoiceModal />;
     case "DELETE_PERMISSION":
       return <DeleteModal />;
     default:
