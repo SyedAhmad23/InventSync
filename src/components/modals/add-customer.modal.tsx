@@ -30,7 +30,7 @@ const AddCustomer = () => {
     const { customer_name, phone, email } = data;
     const jsonData = { customer_name, phone, email };
     //@ts-ignore
-    addCustomer(jsonData)
+    addCustomer(jsonData).unwrap()
       .then(() => {
         reset();
         dispatch(closeModal());
@@ -53,32 +53,28 @@ const AddCustomer = () => {
                 id="customer_name"
                 label="Customer Name"
                 placeholder="Enter name"
+                required={true}
+                error={errors.customer_name?.message}
               />
-              {errors.customer_name && (
-                <p className="text-red-600">{errors.customer_name.message}</p>
-              )}
               <Input
                 {...register("phone")}
                 id="phone"
                 type="number"
                 label="Customer Contact"
                 placeholder="Enter Phone"
+                required={true}
+                error={errors.phone?.message}
               />
-              {errors.phone && (
-                <p className="text-red-600">{errors.phone.message}</p>
-              )}
               <Input
                 {...register("email")}
                 id="email"
                 type="email"
-                label="Customer Email"
+                label="Customer Email (Optional)"
                 placeholder="Enter Email"
               />
               {errors.email && (
                 <p className="text-red-600">{errors.email.message}</p>
               )}
-              {/* <Input {...register("address")} id="name" label="Customer Name" placeholder="Enter name" />
-              {errors.name && <p className="text-red-600">{errors.name.message}</p>} */}
             </div>
           </div>
         </ModalContent>
@@ -86,7 +82,7 @@ const AddCustomer = () => {
           <div className="flex justify-end items-end gap-3">
             <Button
               onClick={() => dispatch(closeModal())}
-              className="px-9"
+              className="bg-slate-300 px-9 text-black hover:bg-primary hover:text-white"
               type="button"
             >
               Cancel

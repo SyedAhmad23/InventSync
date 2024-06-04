@@ -55,10 +55,9 @@ const Sidebar = () => {
     }
   };
   const linkClasses = (path: string) =>
-    `flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8 ${
-      activeLink === path
-        ? "text-foreground bg-accent"
-        : "text-muted-foreground hover:text-foreground"
+    `flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8 ${activeLink === path
+      ? "text-foreground bg-accent"
+      : "text-muted-foreground hover:text-foreground"
     }`;
 
   return (
@@ -119,7 +118,7 @@ const Sidebar = () => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link href="/supplier" className={linkClasses("/suppliers")}>
+                <Link href="/supplier" className={linkClasses("/supplier")}>
                   <BookUser className="h-5 w-5" />
                   <span className="sr-only">Suppliers</span>
                 </Link>

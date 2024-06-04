@@ -1,8 +1,7 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Layout from "@/components/layout/layout";
 import { MdRemoveRedEye, MdAdd } from "react-icons/md";
-import { Category, Customer } from "@/types";
 import { useDispatch } from "react-redux";
 import { openModal, closeModal } from "@/feature/modal/modalSlice";
 import { toast } from "react-toastify";
@@ -11,15 +10,14 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -30,19 +28,35 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 import {
   useDeleteCustomerMutation,
   useGetAllCustomersQuery,
 } from "@/feature/customer/customerApi";
+import { Customer } from "@/types";
 
 const CustomerPage: React.FC = () => {
-  const { data, error, isLoading } = useGetAllCustomersQuery();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const { data, error, isLoading } = useGetAllCustomersQuery({ page: currentPage, limit: itemsPerPage });
+
+  const totalPages = data?.totalPages
+  const totalCustomers = data?.totalCustomers;
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
   const [deleteCustomer] = useDeleteCustomerMutation();
   const dispatch = useDispatch();
-  //@ts-ignore
-  const finaldata = data?.customers;
-  console.log(finaldata,"final");
 
   if (isLoading) return <Layout>Loading...</Layout>;
   if (error) return <Layout>Error...</Layout>;
@@ -85,6 +99,7 @@ const CustomerPage: React.FC = () => {
     );
   };
 
+
   return (
     <Layout>
       <div className="flex items-center">
@@ -98,7 +113,7 @@ const CustomerPage: React.FC = () => {
         </div>
       </div>
 
-      <Card className=" mt-10">
+      <Card className="mt-10">
         <CardHeader>
           <CardTitle>Customers</CardTitle>
           <CardDescription>
@@ -112,16 +127,13 @@ const CustomerPage: React.FC = () => {
                 <TableHead>Name</TableHead>
                 <TableHead>Phone</TableHead>
                 <TableHead>Email</TableHead>
-                {/* <TableHead>
-                  Description
-                </TableHead> */}
                 <TableHead>
                   <span>Actions</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {finaldata?.map((customer: Customer) => (
+              {data?.customers.map((customer: Customer) => (
                 <TableRow key={customer._id}>
                   <TableCell className="font-medium">
                     {customer.customer_name}
@@ -159,6 +171,36 @@ const CustomerPage: React.FC = () => {
             </TableBody>
           </Table>
         </CardContent>
+        <CardFooter>
+          <div className="text-xs text-muted-foreground">
+            Showing <strong>1-10</strong> of <strong>{totalCustomers}</strong>
+          </div>
+        </CardFooter>
+
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => handlePageChange(currentPage - 1)}
+              />
+            </PaginationItem>
+            {[...Array(totalPages)].map((_, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  onClick={() => handlePageChange(index + 1)}
+                  className={index + 1 === currentPage ? "font-semibold bg-slate-200" : ""}
+                >
+                  {index + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => handlePageChange(currentPage + 1)}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </Card>
     </Layout>
   );

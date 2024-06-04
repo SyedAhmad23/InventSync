@@ -95,11 +95,13 @@ const AddProduct = () => {
                     <div className="mt-6">
                         <p className="text-base font-medium">Product Information</p>
                         <div className="grid md:grid-cols-2 gap-x-6 gap-y-4 mt-3">
-                            <Input {...register("name")} id="name" label="Product Name" placeholder="Enter name" />
-                            <Input {...register("buyingPrice")} id="buyingPrice" type="number" label="Buying Price" placeholder="What's the buying price?" />
-                            <Input {...register("sellPrice")} id="sellPrice" type="number" label="Selling Price" placeholder="What's the Selling price?" />
+                            <Input {...register("name")} id="name" label="Product Name" placeholder="Enter name"
+                                required={true}
+                                error={errors.name?.message} />
+                            <Input {...register("buyingPrice")} id="buyingPrice" type="number" label="Buying Price" placeholder="What's the buying price?" required={true} error={errors.buyingPrice?.message} />
+                            <Input {...register("sellPrice")} id="sellPrice" type="number" label="Selling Price" placeholder="What's the Selling price?" required={true} error={errors.sellPrice?.message} />
                             <div>
-                                <h4 className="text-gray-700 mb-2 font-semibold">Category:</h4>
+                                <h4 className="text-gray-700 mb-2 font-semibold">Category</h4>
                                 <CustomSelect
                                     items={finaldata?.map((category: Category) => category.name) || []}
                                     placeholder="Select category"
@@ -112,13 +114,13 @@ const AddProduct = () => {
                                     }}
                                 />
                                 {errors.category && (
-                                    <span className="text-red-600 text-sm font-medium">
+                                    <span className="text-red-600 text-sm">
                                         {errors.category.message}
                                     </span>
                                 )}
                             </div>
                             <div>
-                                <h4 className="text-gray-700 mb-2 font-semibold">Supplier:</h4>
+                                <h4 className="text-gray-700 mb-2 font-semibold">Supplier</h4>
                                 <CustomSelect
                                     items={finalsupplier?.map((supplier) => supplier.name) || []}
                                     placeholder="Select Supplier"
@@ -131,15 +133,16 @@ const AddProduct = () => {
                                     }}
                                 />
                                 {errors.suppliers && (
-                                    <span className="text-red-600 text-sm font-medium">
+                                    <span className="text-red-600 text-sm">
                                         {errors.suppliers.message}
                                     </span>
                                 )}
                             </div>
 
-                            <Input {...register("quantity")} id="quantity" min={1} type="number" label="Quantity" placeholder="How many product quantity?" />
+                            <Input {...register("quantity")} id="quantity" min={1} type="number" label="Quantity" placeholder="How many product quantity?" required={true}
+                                error={errors.quantity?.message} />
                             <div>
-                                <h4 className="text-gray-700 mb-2 font-semibold">Unit Code:</h4>
+                                <h4 className="text-gray-700 mb-2 font-semibold">Unit Code</h4>
                                 <CustomSelect
                                     items={unitCodesData.map(unit => unit.name)}
                                     placeholder="Select unit code"
@@ -152,12 +155,13 @@ const AddProduct = () => {
                                     }}
                                 />
                                 {errors.unitCode && (
-                                    <span className="text-red-600 text-sm font-medium">
+                                    <span className="text-red-600 text-sm">
                                         {errors.unitCode.message}
                                     </span>
                                 )}
                             </div>
-                            <Input {...register("sku")} id="sku" label="SKU" placeholder="Enter SKU" />
+                            <Input {...register("sku")} id="sku" label="SKU" placeholder="Enter SKU" required={true}
+                                error={errors.sku?.message} />
                         </div>
                         <div className="mt-2">
                             <label className="text-charcoalGray">Description</label>
@@ -173,7 +177,8 @@ const AddProduct = () => {
                 </ModalContent>
                 <ModalFooter>
                     <div className="flex justify-end items-end gap-3">
-                        <Button onClick={() => dispatch(closeModal())} className="px-9" type="button">
+                        <Button onClick={() => dispatch(closeModal())} className="bg-slate-300 px-9 text-black hover:bg-primary hover:text-white"
+                            type="button">
                             Cancel
                         </Button>
                         <Button type="submit" loading={isLoadingCreate} >

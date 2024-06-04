@@ -1,20 +1,24 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { API_ENDPOINTS } from "@/constants";
 import { Customer } from "@/types";
+import { CustomerFormValues } from "@/schema/customer-form.schema";
 
 export const customerApi = createApi({
   reducerPath: "customerApi",
   baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
   tagTypes: ["Customer"],
   endpoints: (builder) => ({
-    getAllCustomers: builder.query<Customer[], void>({
-      query: () => ({
-        url: API_ENDPOINTS.CUSTOMER,
+    getAllCustomers: builder.query<
+      { customers: Customer[]; totalPages: number; totalCustomers: number },
+      { page: number; limit: number }
+    >({
+      query: ({ page, limit }) => ({
+        url: `${API_ENDPOINTS.CUSTOMER}?page=${page}&limit=${limit}`,
         method: "GET",
       }),
       providesTags: ["Customer"],
     }),
-    addCustomer: builder.mutation<void, FormData>({
+    addCustomer: builder.mutation<void, CustomerFormValues>({
       query: (formData) => ({
         url: API_ENDPOINTS.CUSTOMER,
         method: "POST",

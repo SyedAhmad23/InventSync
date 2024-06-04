@@ -39,8 +39,10 @@ const AddCategory = () => {
           <div className="mt-6">
             <p className="text-base font-medium">Category Information</p>
             <div className="grid gap-y-4 mt-3">
-              <Input {...register("name")} id="name" label="Category Name" placeholder="Enter name" />
-              {errors.name && <p className="text-red-600">{errors.name.message}</p>}
+              <Input {...register("name")} id="name" label="Category Name" placeholder="Enter name"
+                required={true}
+                error={errors.name?.message}
+              />
             </div>
             <div className="mt-2">
               <label className="block text-gray-700 font-semibold">Description:</label>
@@ -51,13 +53,13 @@ const AddCategory = () => {
                 name="description"
                 className="w-full h-28 rounded-lg bg-white px-4 mt-2 border py-2 resize-none focus:outline-none"
               />
-              {errors.description && <p className="text-red-600">{errors.description.message}</p>}
             </div>
           </div>
         </ModalContent>
         <ModalFooter>
           <div className="flex justify-end items-end gap-3">
-            <Button onClick={() => dispatch(closeModal())} className="px-9" type="button">
+            <Button onClick={() => dispatch(closeModal())} className="bg-slate-300 text-black hover:bg-primary hover:text-white px-9"
+              type="button">
               Cancel
             </Button>
             <Button type="submit" disabled={isLoadingCreate}>

@@ -101,13 +101,13 @@ export default function Dashboard() {
               <CardTitle>Sales Data</CardTitle>
               <div className="gap-2 flex">
                 <Button
-                  className={selectedData === "monthly" ? "bg-gray-200" : ""}
+                  className={selectedData === "monthly" ? "bg-gray-200 text-black" : ""}
                   onClick={() => handleToggle("monthly")}
                 >
                   Monthly
                 </Button>
                 <Button
-                  className={selectedData === "yearly" ? "bg-gray-200" : ""}
+                  className={selectedData === "yearly" ? "bg-gray-200 text-black" : ""}
                   onClick={() => handleToggle("yearly")}
                 >
                   Yearly

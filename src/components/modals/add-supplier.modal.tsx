@@ -11,16 +11,7 @@ import {
   SupplierFormSchema,
   SupplierFormValues,
 } from "@/schema/supplier-form.schema";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
-import { MdRemoveRedEye, MdAdd } from "react-icons/md";
-import Modal, { ModalContent, ModalFooter } from "../ui/modal";
+import { ModalContent, ModalFooter } from "../ui/modal";
 
 const AddSupplier = () => {
   const dispatch = useDispatch();
@@ -49,69 +40,75 @@ const AddSupplier = () => {
         toast.error("Failed to add Supplier");
       });
   };
+
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <ModalContent>
-          <div className="grid lg:grid-cols-2 gap-4">
-            <Input
-              {...register("name")}
-              id="name"
-              label="Name"
-              placeholder="Enter name"
-            />
-            {errors.name && (
-              <p className="text-red-600">{errors.name.message}</p>
-            )}
-            <Input
-              {...register("address")}
-              id="address"
-              label="Address"
-              placeholder="Enter address"
-            />
-            {errors.address && (
-              <p className="text-red-600">{errors.address.message}</p>
-            )}
-            <Input
-              {...register("contact_person")}
-              id="contact_person"
-              label="Contact Person"
-              placeholder="Enter contact person"
-            />
-            {errors.contact_person && (
-              <p className="text-red-600">{errors.contact_person.message}</p>
-            )}
-            <Input
-              {...register("email")}
-              id="email"
-              label="Email"
-              placeholder="Enter email"
-            />
-            {errors.email && (
-              <p className="text-red-600">{errors.email.message}</p>
-            )}
-            <Input
-              {...register("phone")}
-              id="phone"
-              label="Phone"
-              placeholder="Enter phone"
-            />
-            {errors.phone && (
-              <p className="text-red-600">{errors.phone.message}</p>
-            )}
+          <div className="grid md:grid-cols-2 gap-x-6 gap-y-4 mt-3">
+            <div>
+              <Input
+                {...register("name")}
+                id="name"
+                label="Name"
+                placeholder="Enter name"
+                required={true}
+                error={errors.name?.message}
+              />
+            </div>
+            <div>
+              <Input
+                {...register("address")}
+                id="address"
+                label="Address"
+                placeholder="Enter address"
+                required={true}
+                error={errors.address?.message}
+              />
+            </div>
+            <div>
+              <Input
+                {...register("contact_person")}
+                id="contact_person"
+                label="Contact Person"
+                placeholder="Enter contact person"
+                required={true}
+                error={errors.contact_person?.message}
+              />
+            </div>
+            <div>
+              <Input
+                {...register("email")}
+                id="email"
+                label="Email"
+                placeholder="Enter email"
+                required={true}
+                error={errors.email?.message}
+              />
+            </div>
+            <div>
+              <Input
+                {...register("phone")}
+                id="phone"
+                label="Phone"
+                placeholder="Enter phone"
+                required={true}
+                error={errors.phone?.message}
+              />
+            </div>
           </div>
         </ModalContent>
         <ModalFooter>
           <div className="flex justify-end items-end gap-3">
             <Button
               onClick={() => dispatch(closeModal())}
-              className="px-9"
+              className="bg-slate-300 px-9 text-black hover:bg-primary hover:text-white"
               type="button"
             >
               Cancel
             </Button>
             <Button type="submit" loading={isLoadingCreate}>
-              Add Product
+              Add Supplier
             </Button>
           </div>
         </ModalFooter>

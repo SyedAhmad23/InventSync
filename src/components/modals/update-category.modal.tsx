@@ -34,8 +34,8 @@ const UpdateCategory: React.FC = () => {
                 name: category?.name,
                 description: category?.description,
             });
-            console.log(category.name,"name")
-            console.log(category.description,"description")
+            console.log(category.name, "name")
+            console.log(category.description, "description")
         }
     }, [category, reset]);
 
@@ -64,7 +64,8 @@ const UpdateCategory: React.FC = () => {
                     <div className="mt-6">
                         <p className="text-base font-medium">Category Information</p>
                         <div className="grid gap-y-4 mt-3">
-                            <Input {...register("name")} id="name" label="Category Name" placeholder="Enter name" />
+                            <Input {...register("name")} id="name" label="Category Name" placeholder="Enter name" required={true}
+                                error={errors.name?.message} />
                         </div>
                         <div className="mt-2">
                             <label className="text-charcoalGray">Description</label>
@@ -80,7 +81,8 @@ const UpdateCategory: React.FC = () => {
                 </ModalContent>
                 <ModalFooter>
                     <div className="flex justify-end items-end gap-3">
-                        <Button onClick={() => dispatch(closeModal())} className="px-9" type="button">
+                        <Button onClick={() => dispatch(closeModal())} className="bg-slate-300 px-9 text-black hover:bg-primary hover:text-white"
+                            type="button">
                             Cancel
                         </Button>
                         <Button type="submit" loading={isLoadingUpdate}>

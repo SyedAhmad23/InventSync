@@ -47,6 +47,23 @@ const CategoryPage: React.FC = () => {
   const [importCategories] = useImportCategoriesMutation();
 
   const [file, setFile] = useState<File | null>(null);
+  // const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
+  // // Toggle function to switch between expanded and collapsed states
+  // const toggleDescription = (index: number) => {
+  //   setIsDescriptionExpanded(!isDescriptionExpanded);
+  // };
+
+  const [expandedStates, setExpandedStates] = useState<{ [key: string]: boolean }>({});
+
+  const toggleDescription = (categoryId: string) => {
+    setExpandedStates(prevState => ({
+      ...prevState,
+      [categoryId]: !prevState[categoryId],
+    }));
+  };
+
+
   const dispatch = useDispatch();
   //@ts-ignore
   const finaldata = data?.categories;
@@ -172,7 +189,7 @@ const CategoryPage: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {finaldata?.map((category: Category) => (
+              {finaldata?.map((category: Category, index: number) => (
                 <TableRow key={category._id}>
                   <TableCell className="font-medium">{category.name}</TableCell>
                   <TableCell>
@@ -181,7 +198,20 @@ const CategoryPage: React.FC = () => {
                   <TableCell>
                     {new Date(category.updatedAt).toLocaleDateString()}
                   </TableCell>
-                  <TableCell>{category.description}</TableCell>
+                  <TableCell className={`flex flex-col items-start ${expandedStates[category._id] ? "" : "line-clamp-1"} overflow-hidden`}>
+                    {expandedStates[category._id]
+                      ? category.description
+                      : `${category.description.substring(0, 70)}`
+                    }
+                    {category.description.length > 70 && (
+                      <button
+                        className="font-medium text-xs uppercase"
+                        onClick={() => toggleDescription(category._id)}
+                      >
+                        {expandedStates[category._id] ? "View less" : "......View more"}
+                      </button>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -214,7 +244,7 @@ const CategoryPage: React.FC = () => {
           </Table>
         </CardContent>
       </Card>
-    </Layout>
+    </Layout >
   );
 };
 

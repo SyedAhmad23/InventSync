@@ -73,6 +73,8 @@ const UpdateCustomer: React.FC = () => {
                 id="name"
                 label="Customer Name"
                 placeholder="Enter name"
+                required={true}
+                error={errors.customer_name?.message}
               />
             </div>
             <div className="grid gap-y-4 mt-3">
@@ -82,6 +84,8 @@ const UpdateCustomer: React.FC = () => {
                 type="number"
                 label="Customer Contact"
                 placeholder="Enter Phone"
+                required={true}
+                error={errors.phone?.message}
               />
             </div>
             <div className="grid gap-y-4 mt-3">
@@ -99,7 +103,7 @@ const UpdateCustomer: React.FC = () => {
           <div className="flex justify-end items-end gap-3">
             <Button
               onClick={() => dispatch(closeModal())}
-              className="px-9"
+              className="bg-slate-300 px-9 text-black hover:bg-primary hover:text-white"
               type="button"
             >
               Cancel

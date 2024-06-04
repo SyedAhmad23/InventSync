@@ -49,6 +49,9 @@ export interface Customer {
   email: string;
   phone: string;
   address: string;
+  totalCustomers: number;
+  totalPages: number;
+  currentPage: number;
 }
 export interface Invoice {
   date: string | number | Date;

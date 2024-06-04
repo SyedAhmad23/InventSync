@@ -69,7 +69,7 @@ const AddInvoice: React.FC = () => {
       skip: !selectedProductId,
     }
   );
-  const { data: searchCustoemrs } = useSearchCustomersQuery(customerSearchTerm, {
+  const { data: searchCustomers } = useSearchCustomersQuery(customerSearchTerm, {
     skip: !customerSearchTerm,
   });
 
@@ -142,9 +142,6 @@ const AddInvoice: React.FC = () => {
     setItems(updatedItems);
   };
 
-  const toggleCustomerType = () => {
-    setIsNewCustomer((prev) => !prev);
-  };
 
   const handleDiscountTypeChange = (value: string, index: number) => {
     setItems((prevItems) =>
@@ -168,6 +165,15 @@ const AddInvoice: React.FC = () => {
       });
       return;
     }
+    items.forEach(item => {
+      if (item?.discount ?? 0 > 100) {
+        setError("discount", {
+          type: "manual",
+          message: "Discount cannot exceed 100%",
+        });
+        return false;
+      }
+    });
     const invoiceData = {
       customer_type: isNewCustomer ? "new" : "old",
       customer: isNewCustomer ? {
@@ -217,16 +223,30 @@ const AddInvoice: React.FC = () => {
     );
   };
 
-  const handleDiscountChange = (value: string, index: number) => {
-    const newDiscount = parseFloat(value);
+  const [discountError, setDiscountError] = useState('');
 
-    setItems((prevItems) =>
-      prevItems.map((item, i) =>
-        i === index ? { ...item, discount: newDiscount } : item
-      )
-    );
+  const handleDiscountChange = (value: string, item, index: number) => {
+    const discountValue = parseFloat(value);
+    if (isNaN(discountValue)) {
+      setDiscountError('Invalid discount value');
+      return;
+    }
+
+    if (item.discountType === discountTypes.fixed && discountValue >= item.price) {
+      setDiscountError('Discount cannot exceed items price');
+      return;
+    }
+
+    if (item.discountType === discountTypes.percentage && discountValue > 99) {
+      setDiscountError('Discount cannot exceed 100%');
+      return;
+    }
+
+    const updatedItems = [...items];
+    updatedItems[index].discount = discountValue;
+    setItems(updatedItems);
+    setDiscountError('');
   };
-
 
   return (
     <Layout>
@@ -244,7 +264,7 @@ const AddInvoice: React.FC = () => {
                 onChange={(e) => setCustomerSearchTerm(e.target.value)}
               />
               <ul className="fixed border mt-20 bg-white max-w-40 max-h-40 overflow-y-auto w-full z-50">
-                {customerSearchTerm && searchCustoemrs?.map((customer) => (
+                {customerSearchTerm && searchCustomers?.map((customer) => (
                   <li key={customer.id} onClick={() => handleCustomerSelect(customer)} className="cursor-pointer hover:bg-gray-200 p-2"
                   >
                     {customer.name}
@@ -382,9 +402,10 @@ const AddInvoice: React.FC = () => {
                     id={`discount-${index}`}
                     value={item.discount || 0}
                     onChange={(e) =>
-                      handleDiscountChange(e.target.value, index)
+                      handleDiscountChange(e.target.value, item, index)
                     }
                   />
+                  {discountError && <span className="text-red-500 text-xs absolute w-40">{discountError}</span>}
                 </TableCell>
                 <TableCell>
                   <Input
@@ -415,6 +436,7 @@ const AddInvoice: React.FC = () => {
             placeholder="Total Discount"
             id="total_discount"
             className="mb-2"
+            label="Total Discount"
             value={totalDiscount.toFixed(2)}
             disabled
           />
@@ -422,6 +444,7 @@ const AddInvoice: React.FC = () => {
             placeholder="Grand Total"
             id="grand_total"
             className="mb-2"
+            label="Grand Total"
             value={grandTotal.toFixed(2)}
             disabled
           />
@@ -429,6 +452,7 @@ const AddInvoice: React.FC = () => {
             placeholder="Cash Taken"
             id="cash_taken"
             className="mb-2"
+            label="Cash Taken"
             value={totalPaid.toString()}
             onChange={(e) => setTotalPaid(parseInt(e.target.value))}
             min={1}
@@ -437,6 +461,7 @@ const AddInvoice: React.FC = () => {
             placeholder="Return Change"
             id="return_change"
             className="mb-2"
+            label="Return Change"
             value={(totalPaid > grandTotal ? totalPaid - grandTotal : 0).toFixed(2)}
             disabled
           />

@@ -83,53 +83,48 @@ const UpdateSupplier: React.FC = () => {
               id="name"
               label="Name"
               placeholder="Enter name"
+              required={true}
+              error={errors.name?.message}
             />
-            {errors.name && (
-              <p className="text-red-600">{errors.name.message}</p>
-            )}
             <Input
               {...register("address")}
               id="address"
               label="Address"
               placeholder="Enter address"
+              required={true}
+              error={errors.address?.message}
             />
-            {errors.address && (
-              <p className="text-red-600">{errors.address.message}</p>
-            )}
             <Input
               {...register("contact_person")}
               id="contact_person"
               label="Contact Person"
               placeholder="Enter contact person"
+              required={true}
+              error={errors.contact_person?.message}
             />
-            {errors.contact_person && (
-              <p className="text-red-600">{errors.contact_person.message}</p>
-            )}
             <Input
               {...register("email")}
               id="email"
               label="Email"
               placeholder="Enter email"
+              required={true}
+              error={errors.email?.message}
             />
-            {errors.email && (
-              <p className="text-red-600">{errors.email.message}</p>
-            )}
             <Input
               {...register("phone")}
               id="phone"
               label="Phone"
               placeholder="Enter phone"
+              required={true}
+              error={errors.phone?.message}
             />
-            {errors.phone && (
-              <p className="text-red-600">{errors.phone.message}</p>
-            )}
           </div>
         </ModalContent>
         <ModalFooter>
           <div className="flex justify-end items-end gap-3">
             <Button
               onClick={() => dispatch(closeModal())}
-              className="px-9"
+              className="bg-slate-300 px-9 text-black hover:bg-primary hover:text-white"
               type="button"
             >
               Cancel

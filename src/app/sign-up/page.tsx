@@ -88,12 +88,13 @@ const Page = () => {
                         />
                         {errors.confirmPassword && <span className="text-red-500">{errors.confirmPassword.message}</span>}
                     </div>
-                    <Link className="cursor-pointer underline" href={ROUTES.login}>
-                        Already have an account?
-                    </Link>
+
                     <Button type="submit" className="w-full" disabled={isLoading}>
                         {isLoading ? 'Signing up...' : 'Sign Up'}
                     </Button>
+                    <Link className="cursor-pointer underline" href={ROUTES.login}>
+                        Already have an account?
+                    </Link>
                 </form>
             </div>
         </div>

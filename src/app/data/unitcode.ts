@@ -1,4 +1,5 @@
 export const unitCodesData = [
+  { code: "KG", name: "Kg" },
   { code: "BAG", name: "Bag" },
   { code: "BKT", name: "Bucket" },
   { code: "BND", name: "Bundle" },
