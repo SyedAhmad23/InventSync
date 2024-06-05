@@ -102,7 +102,7 @@ const AddSupplier = () => {
           <div className="flex justify-end items-end gap-3">
             <Button
               onClick={() => dispatch(closeModal())}
-              className="bg-slate-300 px-9 text-black hover:bg-primary hover:text-white"
+              variant="secondary"
               type="button"
             >
               Cancel

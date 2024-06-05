@@ -58,7 +58,8 @@ const AddCategory = () => {
         </ModalContent>
         <ModalFooter>
           <div className="flex justify-end items-end gap-3">
-            <Button onClick={() => dispatch(closeModal())} className="bg-slate-300 text-black hover:bg-primary hover:text-white px-9"
+            <Button onClick={() => dispatch(closeModal())}
+              variant="secondary"
               type="button">
               Cancel
             </Button>

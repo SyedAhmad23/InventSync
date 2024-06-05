@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { DatePicker } from "@/components/ui/date";
+import debounce from "lodash.debounce";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,7 @@ import { Customer, Product } from "@/types";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { calculateTotals, calculateValue } from "../lib/utils";
+import Link from "next/link";
 
 interface InvoiceItem {
   product?: Product;
@@ -46,6 +48,7 @@ const AddInvoice: React.FC = () => {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
     null
   );
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(
     null
   );
@@ -75,9 +78,9 @@ const AddInvoice: React.FC = () => {
 
   const handleCustomerSelect = async (customer: Customer) => {
     console.log("Selected Customer ID:", customer.id);
-    setSelectedCustomerId(customer.id || null);
-    //@ts-ignore
-    setCustomerSearchTerm(customer.name);
+    setSelectedCustomerId(customer.id ?? null);
+    setCustomerSearchTerm(customer.name || "");
+    setIsDropdownVisible(false);
     console.log("Selected Customer Name:", customer.name);
 
     try {
@@ -88,17 +91,6 @@ const AddInvoice: React.FC = () => {
       console.error("Failed to fetch customer details:", error);
     }
   };
-
-  useEffect(() => {
-    if (selectedCustomerId) {
-      const fetchCustomerDetails = async () => {
-        //@ts-ignore
-        const response = await useGetCustomerDetailsQuery(selectedCustomerId).unwrap();
-        setCustomerDetails(response);
-      };
-      fetchCustomerDetails();
-    }
-  }, [selectedCustomerId]);
 
   const discountTypes = {
     fixed: "fixed",
@@ -225,6 +217,7 @@ const AddInvoice: React.FC = () => {
 
   const [discountError, setDiscountError] = useState('');
 
+  //@ts-ignore
   const handleDiscountChange = (value: string, item, index: number) => {
     const discountValue = parseFloat(value);
     if (isNaN(discountValue)) {
@@ -248,6 +241,14 @@ const AddInvoice: React.FC = () => {
     setDiscountError('');
   };
 
+  const debouncedProductSearch = debounce((term: string) => {
+    setProductSearchTerm(term);
+  }, 300);
+
+  const debouncedCustomerSearch = debounce((term: string) => {
+    setCustomerSearchTerm(term);
+  }, 300);
+
   return (
     <Layout>
       <h2 className="text-2xl font-bold mb-4">Add Invoice</h2>
@@ -261,16 +262,24 @@ const AddInvoice: React.FC = () => {
                 className="mb-2"
                 label="Select Customer"
                 value={customerSearchTerm}
-                onChange={(e) => setCustomerSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  debouncedCustomerSearch(e.target.value);
+                  setIsDropdownVisible(true);
+                }}
               />
-              <ul className="fixed border mt-20 bg-white max-w-40 max-h-40 overflow-y-auto w-full z-50">
-                {customerSearchTerm && searchCustomers?.map((customer) => (
-                  <li key={customer.id} onClick={() => handleCustomerSelect(customer)} className="cursor-pointer hover:bg-gray-200 p-2"
-                  >
-                    {customer.name}
-                  </li>
-                ))}
-              </ul>
+              {isDropdownVisible && (
+                <ul className="fixed mt-20 bg-white max-w-40 max-h-40 overflow-y-auto w-full z-50">
+                  {customerSearchTerm && searchCustomers?.map((customer) => (
+                    <li
+                      key={customer.id}
+                      onClick={() => handleCustomerSelect(customer)}
+                      className="cursor-pointer hover:bg-gray-200 p-2"
+                    >
+                      {customer.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </>
           )}
           {isNewCustomer && (
@@ -327,7 +336,7 @@ const AddInvoice: React.FC = () => {
                       placeholder="Search product"
                       className="w-40"
                       value={item.product ? item.product.name : productSearchTerm}
-                      onChange={(e) => setProductSearchTerm(e.target.value)}
+                      onChange={(e) => debouncedProductSearch(e.target.value)}
                     />
                     {productSearchTerm && searchResults && (
                       <ul className="fixed bg-white border mt-1 max-w-40 max-h-40 overflow-y-auto w-full z-50">
@@ -467,8 +476,10 @@ const AddInvoice: React.FC = () => {
           />
         </div>
         <div className="flex space-x-2">
-          <Button variant="secondary">Cancel</Button>
-          <Button type="submit">Full Paid</Button>
+          <Link href="/invoices">
+            <Button variant="secondary">Cancel</Button>
+          </Link>
+          <Button type="submit">Pay Invoice</Button>
         </div>
       </form>
     </Layout>

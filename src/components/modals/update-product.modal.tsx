@@ -230,7 +230,8 @@ const UpdateProduct: React.FC = () => {
                 </ModalContent>
                 <ModalFooter>
                     <div className="flex justify-end items-end gap-3">
-                        <Button onClick={() => dispatch(closeModal())} className="bg-slate-300 px-9 text-black hover:bg-primary hover:text-white"
+                        <Button onClick={() => dispatch(closeModal())}
+                            variant="secondary"
                             type="button">
                             Cancel
                         </Button>

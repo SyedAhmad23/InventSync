@@ -31,7 +31,7 @@ const DeleteCategory: React.FC = () => {
                         onClick={() => dispatch(closeModal())}
                         size="lg"
                         type="button"
-                        className="bg-slate-300 text-black hover:bg-primary hover:text-white"
+                        variant="secondary"
                     >
                         Cancel
                     </Button>
