@@ -39,6 +39,7 @@ import {
 } from "@/feature/category/categoryApi";
 import { Input } from "@/components/ui/input";
 import { File } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const CategoryPage: React.FC = () => {
   const { data, error, isLoading } = useGetAllCategoriesQuery();
@@ -54,21 +55,21 @@ const CategoryPage: React.FC = () => {
   //   setIsDescriptionExpanded(!isDescriptionExpanded);
   // };
 
-  const [expandedStates, setExpandedStates] = useState<{ [key: string]: boolean }>({});
+  const [expandedStates, setExpandedStates] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   const toggleDescription = (categoryId: string) => {
-    setExpandedStates(prevState => ({
+    setExpandedStates((prevState) => ({
       ...prevState,
       [categoryId]: !prevState[categoryId],
     }));
   };
 
-
   const dispatch = useDispatch();
   //@ts-ignore
   const finaldata = data?.categories;
   console.log(finaldata);
-  if (isLoading) return <Layout>Loading...</Layout>;
   if (error) return <Layout>Error...</Layout>;
 
   const handleAddCategory = () => {
@@ -136,39 +137,47 @@ const CategoryPage: React.FC = () => {
     <Layout>
       <div className="flex items-center">
         <div className="ml-auto flex items-center gap-2">
-          <Input type="file" onChange={handleFileChange} className="h-8" />
+          <Input
+            type="file"
+            onChange={handleFileChange}
+            className="h-8 text-white bg-gray-700"
+          />
           <Button
             size="sm"
             variant="outline"
-            className="h-8 gap-1"
+            className="h-8 bg-gray-700 text-white gap-1"
             onClick={handleImportCategories}
           >
             <File className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap ">
               Import
             </span>
           </Button>
           <Button
             size="sm"
             variant="outline"
-            className="h-8 gap-1"
+            className="h-8 bg-gray-700 text-white gap-1"
             onClick={handleExportCategories}
           >
             <File className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap ">
               Export
             </span>
           </Button>
-          <Button size="sm" className="h-8 gap-1" onClick={handleAddCategory}>
+          <Button
+            size="sm"
+            className="h-8 bg-gray-700 text-white gap-1"
+            onClick={handleAddCategory}
+          >
             <MdAdd className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap ">
               Add Categories
             </span>
           </Button>
         </div>
       </div>
 
-      <Card className=" mt-10">
+      <Card className=" mt-10 bg-gray-700 text-white">
         <CardHeader>
           <CardTitle>Categories</CardTitle>
           <CardDescription>
@@ -176,75 +185,108 @@ const CategoryPage: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
+          <Table className="bg-gray-500 text-white">
+            <TableHeader className="bg-slate-200">
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>CreatedAt</TableHead>
-                <TableHead>UpdatedAt</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>
+                <TableHead className="text-black">Name</TableHead>
+                <TableHead className="text-black">CreatedAt</TableHead>
+                <TableHead className="text-black">UpdatedAt</TableHead>
+                <TableHead className="text-black">Description</TableHead>
+                <TableHead className="text-black">
                   <span>Actions</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {finaldata?.map((category: Category, index: number) => (
-                <TableRow key={category._id}>
-                  <TableCell className="font-medium">{category.name}</TableCell>
-                  <TableCell>
-                    {new Date(category.createdAt).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    {new Date(category.updatedAt).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className={`flex flex-col items-start ${expandedStates[category._id] ? "" : "line-clamp-1"} overflow-hidden`}>
-                    {expandedStates[category._id]
-                      ? category.description
-                      : `${category.description.substring(0, 70)}`
-                    }
-                    {category.description.length > 70 && (
-                      <button
-                        className="font-medium text-xs uppercase"
-                        onClick={() => toggleDescription(category._id)}
-                      >
-                        {expandedStates[category._id] ? "View less" : "......View more"}
-                      </button>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-haspopup="true"
-                          size="icon"
-                          variant="ghost"
+            {isLoading ? (
+              <TableBody>
+                {Array(4)
+                  .fill(0)
+                  .map((_, rowIndex) => (
+                    <TableRow key={`skeleton-row-${rowIndex}`}>
+                      <TableCell>
+                        <Skeleton className="h-6 w-20 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-32 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-32 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-full rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-10 rounded-sm" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            ) : (
+              <TableBody>
+                {finaldata?.map((category: Category, index: number) => (
+                  <TableRow key={category._id}>
+                    <TableCell className="font-medium">
+                      {category.name}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(category.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(category.updatedAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell
+                      className={`flex flex-col items-start ${
+                        expandedStates[category._id] ? "" : "line-clamp-1"
+                      } overflow-hidden`}
+                    >
+                      {expandedStates[category._id]
+                        ? category.description
+                        : `${category.description.substring(0, 70)}`}
+                      {category.description.length > 70 && (
+                        <button
+                          className="font-medium text-xs uppercase"
+                          onClick={() => toggleDescription(category._id)}
                         >
-                          <MdRemoveRedEye className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => handleUpdateCategory(category)}
-                        >
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => onDeleteCategory(category._id)}
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
+                          {expandedStates[category._id]
+                            ? "View less"
+                            : "......View more"}
+                        </button>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            aria-haspopup="true"
+                            size="icon"
+                            variant="ghost"
+                          >
+                            <MdRemoveRedEye className="h-4 w-4" />
+                            <span className="sr-only">Toggle menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => handleUpdateCategory(category)}
+                          >
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => onDeleteCategory(category._id)}
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            )}
           </Table>
         </CardContent>
       </Card>
-    </Layout >
+    </Layout>
   );
 };
 

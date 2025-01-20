@@ -1,4 +1,4 @@
-"use client"
+"use client";
 // import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
@@ -28,7 +28,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
+          "min-h-screen bg-gray-900 text-white font-sans antialiased",
           inter.variable
         )}
       >

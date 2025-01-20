@@ -7,7 +7,7 @@ import {
   useDownloadProductsQuery,
   useImportProductsMutation,
 } from "@/feature/product/productApi";
-import { MdDelete, MdEdit, MdRemoveRedEye, MdAdd } from "react-icons/md";
+import { MdRemoveRedEye, MdAdd } from "react-icons/md";
 import { Product } from "@/types";
 import { useDispatch } from "react-redux";
 import { openModal, closeModal } from "@/feature/modal/modalSlice";
@@ -19,7 +19,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -38,8 +37,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { File } from "lucide-react";
-import Image from "next/image";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ProductPage: React.FC = () => {
   const { data, error, isLoading } = useGetAllProductsQuery();
@@ -53,7 +52,6 @@ const ProductPage: React.FC = () => {
   //@ts-ignore
   const finaldata = data?.products;
   console.log(finaldata);
-  if (isLoading) return <Layout>Loading...</Layout>;
   if (error) return <Layout>Error...</Layout>;
 
   const handleAddProduct = () => {
@@ -156,7 +154,7 @@ const ProductPage: React.FC = () => {
         </div>
       </div>
 
-      <Card className=" mt-10">
+      <Card className="mt-10">
         <CardHeader>
           <CardTitle>Products</CardTitle>
           <CardDescription>
@@ -181,61 +179,98 @@ const ProductPage: React.FC = () => {
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {finaldata?.map((product: Product) => (
-                <TableRow key={product._id}>
-                  <TableCell className="hidden sm:table-cell">
-                    <img
-                      alt="Product image"
-                      className="aspect-square rounded-md object-cover"
-                      height="64"
-                      //@ts-ignore
-                      src={product.image || NoImg}
-                      width="64"
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{product.quantity}</Badge>
-                  </TableCell>
-                  <TableCell>{product.buyingPrice}</TableCell>
-                  <TableCell>{product.sellPrice}</TableCell>
-                  <TableCell>{product.category?.name}</TableCell>
-                  <TableCell>{product.description}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-haspopup="true"
-                          size="icon"
-                          variant="ghost"
-                        >
-                          <MdRemoveRedEye className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => handleViewProduct(product)}
-                        >
-                          View
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleUpdateProduct(product)}
-                        >
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => onDeleteProduct(product._id)}
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
+            {isLoading ? (
+              <TableBody>
+                {Array(4)
+                  .fill(0)
+                  .map((_, rowIndex) => (
+                    <TableRow key={`skeleton-row-${rowIndex}`}>
+                      <TableCell>
+                        <Skeleton className="h-6 w-20 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-32 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-32 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-32 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-32 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-32 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-full rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-10 rounded-sm" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            ) : (
+              <TableBody>
+                {finaldata?.map((product: Product) => (
+                  <TableRow key={product._id}>
+                    <TableCell className="hidden sm:table-cell">
+                      <img
+                        alt="Product image"
+                        className="aspect-square rounded-md object-cover"
+                        height="64"
+                        //@ts-ignore
+                        src={product.image || NoImg}
+                        width="64"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {product.name}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{product.quantity}</Badge>
+                    </TableCell>
+                    <TableCell>{product.buyingPrice}</TableCell>
+                    <TableCell>{product.sellPrice}</TableCell>
+                    <TableCell>{product.category?.name}</TableCell>
+                    <TableCell>{product.description}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            aria-haspopup="true"
+                            size="icon"
+                            variant="ghost"
+                          >
+                            <MdRemoveRedEye className="h-4 w-4" />
+                            <span className="sr-only">Toggle menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => handleViewProduct(product)}
+                          >
+                            View
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleUpdateProduct(product)}
+                          >
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => onDeleteProduct(product._id)}
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            )}
           </Table>
         </CardContent>
       </Card>

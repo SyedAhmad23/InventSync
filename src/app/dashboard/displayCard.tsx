@@ -16,7 +16,7 @@ const DisplayCard: React.FC<CustomCardProps> = ({
   className,
 }) => {
   return (
-    <Card className={`pt-4 ${className}`}>
+    <Card className={`pt-4 bg-gray-700 text-white ${className}`}>
       <CardContent className=" flex ">
         <div>
           {logo && typeof logo === "object" && (
@@ -36,7 +36,7 @@ const DisplayCard: React.FC<CustomCardProps> = ({
         </div>
         <div>
           <CardTitle className=" font-medium text-lg">{text}</CardTitle>
-          <p className="text-lg font-semibold text-gray-600">{data}</p>
+          <p className="text-lg font-semibold text-gray-200">{data}</p>
         </div>
       </CardContent>
     </Card>

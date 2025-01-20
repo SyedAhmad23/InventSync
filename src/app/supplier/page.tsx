@@ -40,6 +40,7 @@ import {
   useGetAllSuppliersQuery,
 } from "@/feature/supplier/supplierApi";
 import AddSupplier from "@/components/modals/add-supplier.modal";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const CategoryPage: React.FC = () => {
   const { data, error, isLoading } = useGetAllSuppliersQuery();
@@ -48,7 +49,6 @@ const CategoryPage: React.FC = () => {
   //@ts-ignore
   const finaldata = data;
   console.log(finaldata);
-  if (isLoading) return <Layout>Loading...</Layout>;
   if (error) return <Layout>Error...</Layout>;
 
   const handleAddSupplier = () => {
@@ -114,63 +114,84 @@ const CategoryPage: React.FC = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead >
-                  Contact Person
-                </TableHead>
-                <TableHead >Email</TableHead>
-                <TableHead >Phone</TableHead>
-                <TableHead >Address</TableHead>
+                <TableHead>Contact Person</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Address</TableHead>
                 <TableHead>
-                  <span >Actions</span>
+                  <span>Actions</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {finaldata?.map((supplier: Supplier) => (
-                <TableRow key={supplier._id}>
-                  <TableCell className="font-medium">{supplier.name}</TableCell>
-                  <TableHead >
-                    {supplier.contact_person}
-                  </TableHead>
-                  <TableCell >
-                    {supplier.email}
-                  </TableCell>
-                  <TableCell >
-                    {supplier.phone}
-                  </TableCell>
-                  <TableCell >
-                    {supplier.address}
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-haspopup="true"
-                          size="icon"
-                          variant="ghost"
-                        >
-                          <MdRemoveRedEye className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => handleUpdateSupplier(supplier)}
-                        >
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          //@ts-ignore
-                          onClick={() => onDeleteSupplier(supplier._id)}
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
+            {isLoading ? (
+              <TableBody>
+                {Array(4)
+                  .fill(0)
+                  .map((_, rowIndex) => (
+                    <TableRow key={`skeleton-row-${rowIndex}`}>
+                      <TableCell>
+                        <Skeleton className="h-6 w-20 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-32 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <TableCell>
+                          <Skeleton className="h-6 w-32 rounded-sm" />
+                        </TableCell>
+                        <Skeleton className="h-6 w-32 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-full rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-10 rounded-sm" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            ) : (
+              <TableBody>
+                {finaldata?.map((supplier: Supplier) => (
+                  <TableRow key={supplier._id}>
+                    <TableCell className="font-medium">
+                      {supplier.name}
+                    </TableCell>
+                    <TableHead>{supplier.contact_person}</TableHead>
+                    <TableCell>{supplier.email}</TableCell>
+                    <TableCell>{supplier.phone}</TableCell>
+                    <TableCell>{supplier.address}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            aria-haspopup="true"
+                            size="icon"
+                            variant="ghost"
+                          >
+                            <MdRemoveRedEye className="h-4 w-4" />
+                            <span className="sr-only">Toggle menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => handleUpdateSupplier(supplier)}
+                          >
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            //@ts-ignore
+                            onClick={() => onDeleteSupplier(supplier._id)}
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            )}
           </Table>
         </CardContent>
       </Card>

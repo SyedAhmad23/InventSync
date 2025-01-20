@@ -43,14 +43,18 @@ import {
   useGetAllCustomersQuery,
 } from "@/feature/customer/customerApi";
 import { Customer } from "@/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const CustomerPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const { data, error, isLoading } = useGetAllCustomersQuery({ page: currentPage, limit: itemsPerPage });
+  const { data, error, isLoading } = useGetAllCustomersQuery({
+    page: currentPage,
+    limit: itemsPerPage,
+  });
 
-  const totalPages = data?.totalPages
+  const totalPages = data?.totalPages;
   const totalCustomers = data?.totalCustomers;
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -58,7 +62,6 @@ const CustomerPage: React.FC = () => {
   const [deleteCustomer] = useDeleteCustomerMutation();
   const dispatch = useDispatch();
 
-  if (isLoading) return <Layout>Loading...</Layout>;
   if (error) return <Layout>Error...</Layout>;
 
   const handleAddCustomer = () => {
@@ -99,7 +102,6 @@ const CustomerPage: React.FC = () => {
     );
   };
 
-
   return (
     <Layout>
       <div className="flex items-center">
@@ -132,75 +134,98 @@ const CustomerPage: React.FC = () => {
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {data?.customers.map((customer: Customer) => (
-                <TableRow key={customer._id}>
-                  <TableCell className="font-medium">
-                    {customer.customer_name}
-                  </TableCell>
-                  <TableCell>{customer.phone}</TableCell>
-                  <TableCell>{customer.email}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-haspopup="true"
-                          size="icon"
-                          variant="ghost"
-                        >
-                          <MdRemoveRedEye className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => handleUpdateCategory(customer)}
-                        >
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => onDeleteCustomer(customer._id)}
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
+            {isLoading ? (
+              <TableBody>
+                {Array(4)
+                  .fill(0)
+                  .map((_, rowIndex) => (
+                    <TableRow key={`skeleton-row-${rowIndex}`}>
+                      <TableCell>
+                        <Skeleton className="h-6 w-20 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-32 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-32 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-10 rounded-sm" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            ) : (
+              <TableBody>
+                {data?.customers.map((customer: Customer) => (
+                  <TableRow key={customer._id}>
+                    <TableCell className="font-medium">
+                      {customer.customer_name}
+                    </TableCell>
+                    <TableCell>{customer.phone}</TableCell>
+                    <TableCell>{customer.email}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            aria-haspopup="true"
+                            size="icon"
+                            variant="ghost"
+                          >
+                            <MdRemoveRedEye className="h-4 w-4" />
+                            <span className="sr-only">Toggle menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => handleUpdateCategory(customer)}
+                          >
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => onDeleteCustomer(customer._id)}
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            )}
           </Table>
         </CardContent>
         <CardFooter>
-          <div className="text-xs text-muted-foreground">
-            Showing <strong>1-10</strong> of <strong>{totalCustomers}</strong>
-          </div>
-        </CardFooter>
-
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => handlePageChange(currentPage - 1)}
-              />
-            </PaginationItem>
-            {[...Array(totalPages)].map((_, index) => (
-              <PaginationItem key={index}>
-                <PaginationLink
-                  onClick={() => handlePageChange(index + 1)}
-                  className={index + 1 === currentPage ? "font-semibold bg-slate-200" : ""}
-                >
-                  {index + 1}
-                </PaginationLink>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => handlePageChange(currentPage - 1)}
+                />
               </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() => handlePageChange(currentPage + 1)}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+              {[...Array(totalPages)].map((_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    onClick={() => handlePageChange(index + 1)}
+                    className={
+                      index + 1 === currentPage
+                        ? "font-semibold bg-slate-200"
+                        : ""
+                    }
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => handlePageChange(currentPage + 1)}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </CardFooter>
       </Card>
     </Layout>
   );

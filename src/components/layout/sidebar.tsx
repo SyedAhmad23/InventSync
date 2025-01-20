@@ -55,14 +55,15 @@ const Sidebar = () => {
     }
   };
   const linkClasses = (path: string) =>
-    `flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8 ${activeLink === path
-      ? "text-foreground bg-accent"
-      : "text-muted-foreground hover:text-foreground"
+    `flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8 ${
+      activeLink === path
+        ? "text-foreground bg-accent"
+        : "text-muted-foreground hover:text-foreground"
     }`;
 
   return (
     <div>
-      <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
+      <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-gray-900 text-white sm:flex">
         <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
           <Link
             href="#"
@@ -73,7 +74,7 @@ const Sidebar = () => {
           </Link>
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger asChild>
+              <TooltipTrigger className="hover:text-white" asChild>
                 <Link href="/dashboard" className={linkClasses("/dashboard")}>
                   <Home className="h-5 w-5" />
                   <span className="sr-only">Dashboard</span>
@@ -84,9 +85,9 @@ const Sidebar = () => {
           </TooltipProvider>
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger asChild>
+              <TooltipTrigger className="hover:text-white" asChild>
                 <Link href="/categories" className={linkClasses("/categories")}>
-                  <Menu className="h-5 w-5" />
+                  <Menu className="h-5 w-5 hover:text-white" />
                   <span className="sr-only">Categories</span>
                 </Link>
               </TooltipTrigger>
@@ -95,9 +96,9 @@ const Sidebar = () => {
           </TooltipProvider>
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger asChild>
+              <TooltipTrigger className="hover:text-white" asChild>
                 <Link href="/products" className={linkClasses("/products")}>
-                  <Package className="h-5 w-5" />
+                  <Package className="h-5 w-5 hover:text-white" />
                   <span className="sr-only">Products</span>
                 </Link>
               </TooltipTrigger>
@@ -106,9 +107,9 @@ const Sidebar = () => {
           </TooltipProvider>
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger asChild>
+              <TooltipTrigger className="hover:text-white" asChild>
                 <Link href="/invoices" className={linkClasses("/invoices")}>
-                  <BadgeDollarSign className="h-5 w-5" />
+                  <BadgeDollarSign className="h-5 w-5 hover:text-white" />
                   <span className="sr-only">Invoices</span>
                 </Link>
               </TooltipTrigger>
@@ -117,9 +118,9 @@ const Sidebar = () => {
           </TooltipProvider>
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger asChild>
+              <TooltipTrigger className="hover:text-white" asChild>
                 <Link href="/supplier" className={linkClasses("/supplier")}>
-                  <BookUser className="h-5 w-5" />
+                  <BookUser className="h-5 w-5 hover:text-white" />
                   <span className="sr-only">Suppliers</span>
                 </Link>
               </TooltipTrigger>
@@ -128,9 +129,9 @@ const Sidebar = () => {
           </TooltipProvider>
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger asChild>
+              <TooltipTrigger className="hover:text-white" asChild>
                 <Link href="/customers" className={linkClasses("/customers")}>
-                  <Users2 className="h-5 w-5" />
+                  <Users2 className="h-5 w-5 hover:text-white" />
                   <span className="sr-only">Customers</span>
                 </Link>
               </TooltipTrigger>
@@ -141,12 +142,12 @@ const Sidebar = () => {
         <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger asChild>
+              <TooltipTrigger className="hover:text-white" asChild>
                 <button
                   onClick={handleLogout}
                   className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                 >
-                  <LogOut className="h-5 w-5" />
+                  <LogOut className="h-5 w-5 hover:text-white" />
                   <span className="sr-only">Logout</span>
                 </button>
               </TooltipTrigger>

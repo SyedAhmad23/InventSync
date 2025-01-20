@@ -38,6 +38,7 @@ import {
 } from "@/feature/invoice/invoiceApi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const InvoicePage: React.FC = () => {
   const { data, error, isLoading } = useGetAllInvoicesQuery();
@@ -49,7 +50,6 @@ const InvoicePage: React.FC = () => {
   //@ts-ignore
   const finaldata = data;
   console.log(finaldata);
-  if (isLoading) return <Layout>Loading...</Layout>;
   if (error) return <Layout>Error...</Layout>;
 
   const handleDeleteInvoice = async (id: string) => {
@@ -115,48 +115,80 @@ const InvoicePage: React.FC = () => {
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {finaldata?.map((invoice: Invoice) => (
-                <TableRow key={invoice._id}>
-                  <TableCell className="font-medium">
-                    {invoice.invoiceNumber}
-                  </TableCell>
-                  <TableCell>
-                    <Button size="sm">Paid</Button>
-                  </TableCell>
-                  <TableCell>{invoice.totalAmount}</TableCell>
-                  <TableCell>{invoice.totalPaid}</TableCell>
-                  <TableCell>{invoice.total_discount}</TableCell>
-                  <TableCell>{invoice.return_amount}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-haspopup="true"
-                          size="icon"
-                          variant="ghost"
-                        >
-                          <MdRemoveRedEye className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {/* <DropdownMenuItem
+            {isLoading ? (
+              <TableBody>
+                {Array(4)
+                  .fill(0)
+                  .map((_, rowIndex) => (
+                    <TableRow key={`skeleton-row-${rowIndex}`}>
+                      <TableCell>
+                        <Skeleton className="h-6 w-20 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-32 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-32 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-32 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-32 rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-full rounded-sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-10 rounded-sm" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            ) : (
+              <TableBody>
+                {finaldata?.map((invoice: Invoice) => (
+                  <TableRow key={invoice._id}>
+                    <TableCell className="font-medium">
+                      {invoice.invoiceNumber}
+                    </TableCell>
+                    <TableCell>
+                      <Button size="sm">Paid</Button>
+                    </TableCell>
+                    <TableCell>{invoice.totalAmount}</TableCell>
+                    <TableCell>{invoice.totalPaid}</TableCell>
+                    <TableCell>{invoice.total_discount}</TableCell>
+                    <TableCell>{invoice.return_amount}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            aria-haspopup="true"
+                            size="icon"
+                            variant="ghost"
+                          >
+                            <MdRemoveRedEye className="h-4 w-4" />
+                            <span className="sr-only">Toggle menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {/* <DropdownMenuItem
                           onClick={() => handleUpdateInvoice(invoice)}
                         >
                           Update
                         </DropdownMenuItem> */}
-                        <DropdownMenuItem
-                          onClick={() => onDeleteCategory(invoice._id)}
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
+                          <DropdownMenuItem
+                            onClick={() => onDeleteCategory(invoice._id)}
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            )}
           </Table>
         </CardContent>
       </Card>

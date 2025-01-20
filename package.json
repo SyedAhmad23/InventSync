@@ -29,6 +29,7 @@
     "csv-parser": "^3.0.0",
     "csv-writer": "^1.6.0",
     "date-fns": "^3.6.0",
+    "inventory-management-system": "file:",
     "jsonwebtoken": "^9.0.2",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.378.0",
