@@ -177,7 +177,7 @@ const CategoryPage: React.FC = () => {
         </div>
       </div>
 
-      <Card className=" mt-10 bg-gray-700 text-white">
+      <Card className=" mt-10 ">
         <CardHeader>
           <CardTitle>Categories</CardTitle>
           <CardDescription>
@@ -185,8 +185,8 @@ const CategoryPage: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table className="bg-gray-500 text-white">
-            <TableHeader className="bg-slate-200">
+          <Table>
+            <TableHeader>
               <TableRow>
                 <TableHead className="text-black">Name</TableHead>
                 <TableHead className="text-black">CreatedAt</TableHead>

@@ -122,11 +122,15 @@ const ProductPage: React.FC = () => {
     <Layout>
       <div className="flex items-center">
         <div className="ml-auto flex items-center gap-2">
-          <Input type="file" onChange={handleFileChange} className="h-8" />
+          <Input
+            type="file"
+            onChange={handleFileChange}
+            className="h-8 text-white bg-gray-700"
+          />
           <Button
             size="sm"
             variant="outline"
-            className="h-8 gap-1"
+            className="h-8 bg-gray-700 text-white gap-1"
             onClick={handleImportProducts}
           >
             <File className="h-3.5 w-3.5" />
@@ -137,7 +141,7 @@ const ProductPage: React.FC = () => {
           <Button
             size="sm"
             variant="outline"
-            className="h-8 gap-1"
+            className="h-8 bg-gray-700 text-white gap-1"
             onClick={handleExportProducts}
           >
             <File className="h-3.5 w-3.5" />
