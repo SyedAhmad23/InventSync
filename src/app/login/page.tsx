@@ -10,6 +10,7 @@ import { useLoginMutation } from "@/feature/auth/authApi";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useConfig } from "../config/hooks";
+import { Loader } from "lucide-react";
 
 interface LoginFormInputs {
   email: string;
@@ -40,12 +41,15 @@ const Page = () => {
   };
 
   return (
-    <div className="bg-gray-50">
-      <div className="flex flex-col items-center justify-center mx-auto container w-96 gap-5 h-screen">
+    <div className="">
+      <div className="flex flex-col items-center justify-center mx-auto container bg w-96 gap-5 h-screen">
         <Logo className="w-20 h-20" />
-        <h1 className="font-bold text-2xl">Login To Inventory</h1>
+        <h1 className="font-bold text-2xl">Login To InventSync</h1>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="w-full gap-10">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="w-full gap-10 bg-white p-2 pt-4 rounded-md"
+        >
           <div className="w-full mb-5">
             <Input
               label="Email"
@@ -84,16 +88,16 @@ const Page = () => {
             )}
           </div>
           <Link
-            className="cursor-pointer underline text-sm"
+            className="cursor-pointer underline text-black text-sm"
             href={ROUTES.forgotPassword}
           >
             Forgot Password?
           </Link>
           <Button type="submit" className="w-full mt-5" disabled={isLoading}>
-            {isLoading ? "Logging in..." : "Login"}
+            {isLoading ? <Loader className="animate-spin" /> : "Login"}
           </Button>
           <Link
-            className="cursor-pointer mt-2 text-sm underline"
+            className="cursor-pointer mt-2 text-sm underline hidden"
             href={ROUTES.signUp}
           >
             Don&apos;t have an account?
